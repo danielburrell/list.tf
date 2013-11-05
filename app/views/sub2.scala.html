@@ -1,0 +1,49 @@
+@(title: String)(content: Html)
+asd
+<div class="well">
+
+	<div ng-repeat="item in items" class="panel panel-primary">
+		  <div class="panel-heading"><a class="pull-left" href="#">
+              <img class="media-object" height="24" width="24" hspace="5" src="http://media.steampowered.com/apps/440/icons/c_ambassador_opt.5a05f0ae3486dc204d2c2e037cda748d58e6bc2b.png" alt=""/>
+  </a> {{item.itemId}} <div class="btn-group btn-group-xs pull-right"><button type="button" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-plus"></span> Add entry</button></div></div>
+		  <table class="table table-condensed">
+			<thead>
+				<tr>
+                    <th></th>
+				  <th>Quality</th>
+				  <th>Level</th>
+				  <th>Tradable</th>
+				  <th>Craftable</th>
+				  <th>Craft</th>
+				  <th>Giftwrapped</th>
+                    <th>Price Range</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="detail in item.details">
+                    <td>
+<div class="btn-group btn-group-xs">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    Action <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a href="#/edit/{{detail.detailId}}/"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
+    <li><a href="#/obtained/{{detail.detailId}}/"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a></li>
+    <li class="divider"></li>
+    <li><a href="#/delete/{{detail.detailId}}/"><span class="glyphicon glyphicon-remove"></span> Delete</a></li>
+  </ul>
+</div>
+					</td>
+				  <td>{{qualityIdToString(detail.quality)}}</td>
+				  <td>{{detail.level}}</td>
+				  <td>{{tradableToString(detail.tradable)}}</td>
+				  <td>{{craftableToString(detail.craftable)}}</td>
+				  <td>{{craftNumberToString(detail.craftnumber)}}</td>
+				  <td>{{giftwrapToString(detail.giftwrapped)}}</td>
+				  <td>{{detail.price}}</td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</div>
+</div>

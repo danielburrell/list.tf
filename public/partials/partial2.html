@@ -1,0 +1,24 @@
+<div  ng-controller="MyCtrl1">
+
+   <div wanted-nav logged-in="loggedIn" my-steam-id="mySteamId"></div>
+
+
+<div class="jumbotron">
+  <h1>Wanted.TF</h1>
+  <p>Your most wanted items in Team Fortress 2</p>
+  <p><a href="/login"><img ng-hide="loggedIn" alt="Sign In" src="/assets/images/sits_large_noborder.png"></a>
+  </p>
+  <p ng-hide="!loggedIn">You are logged in as {{mySteamId}}</p>
+</div>
+
+
+
+
+<footer class="footer">
+<center>
+            <p>&copy; 2013 Wanted.tf All rights reserved.</p>
+      <p>Powered by Steam. Not affiliated with Steam.</p>
+      <p><a href="/privacy">Privacy Policy</a></p><a href="/privacy">
+        </a>
+    </center></footer>
+    </div>

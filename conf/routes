@@ -1,0 +1,28 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# HTML requests
+GET     /                           controllers.Application.index()
+GET     /                           controllers.Application.privacy()
+GET     /                           controllers.Application.about()
+GET     /id/:steamId/                           controllers.Application.wanted(steamId: Long)
+GET     /openIDCallback                         controllers.Application.openIDCallback()
+GET     /login                         controllers.Application.login()
+GET     /logout                         controllers.Application.logout()
+
+
+# HTML partials
+GET		/partial/list.html		controllers.Application.wantedPartial()
+
+# JSON requests
+GET     /api/getWantedList/:steamId                           controllers.Application.getWantedList(steamId: Long)
+POST     /api/addDetail/:wantedId                        controllers.Application.addDetail(wantedId: Long)
+POST     /api/editDetail/detailId/:detailId                           controllers.Application.editDetail(detailId: Long)
+POST     /api/deleteDetail/detailId/:detailId                           controllers.Application.deleteDetail(detailId: Long)
+POST     /api/markAsObtained/detailId/:detailId                           controllers.Application.markAsObtained(detailId: Long)
+POST     /api/markAsUnobtained/detailId/:detailId                           controllers.Application.markAsUnobtained(detailId: Long)
+GET     /loginStatus                         controllers.Application.loginStatus()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
