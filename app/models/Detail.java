@@ -21,10 +21,10 @@ public class Detail extends Model{
     public Long detailId;
     public Integer quality;
     public Integer levelNumber;
-    public Boolean isTradable;
-    public Boolean isCraftable;
+    public Integer isTradable;
+    public Integer isCraftable;
     public Long craftNumber;
-    public Boolean isGiftWrapped;
+    public Integer isGiftWrapped;
     public String price;
     public Boolean isObtained;
     public Integer priority;

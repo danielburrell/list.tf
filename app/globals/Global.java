@@ -28,7 +28,7 @@ public class Global extends GlobalSettings {
     @Override
     public void onStart(Application app) {
         Logger.info("Scheduling schema watcher");
-        Akka.system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS), Duration.create(10, TimeUnit.SECONDS),
+        Akka.system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS), Duration.create(30, TimeUnit.MINUTES),
 
         new Runnable() {
 

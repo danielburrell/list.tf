@@ -12,6 +12,7 @@ import java.util.Map;
 import models.Detail;
 import models.Item;
 import models.SteamUser;
+import models.ValidationFailure;
 
 import org.expressme.openid.Association;
 import org.expressme.openid.Endpoint;
@@ -90,10 +91,10 @@ public class Application extends Controller {
                         return ok(index.render(""));
 
                     case 1:
-                        return ok(index.render(""));//"Oh hey, you're back! New items have been released since you were last here. Go! Go! Go!"
+                        return ok(index.render(""));// "Oh hey, you're back! New items have been released since you were last here. Go! Go! Go!"
 
                     case 2:
-                        return ok(index.render("")); //"Oh hey, you're back! No new items have been released since you were last here."
+                        return ok(index.render("")); // "Oh hey, you're back! No new items have been released since you were last here."
 
                     default:
                         return ok("What is this I don't even..");
@@ -194,10 +195,10 @@ public class Application extends Controller {
                 Detail detail = new Detail();
                 detail.detailId = detailId;
                 detail.craftNumber = (Long) row.get("craft_number");
-                detail.isCraftable = (Boolean) row.get("is_craftable");
-                detail.isGiftWrapped = (Boolean) row.get("is_gift_wrapped");
+                detail.isCraftable = (Integer) row.get("is_craftable");
+                detail.isGiftWrapped = (Integer) row.get("is_gift_wrapped");
                 detail.isObtained = (Boolean) row.get("is_obtained");
-                detail.isTradable = (Boolean) row.get("is_tradable");
+                detail.isTradable = (Integer) row.get("is_tradable");
                 detail.levelNumber = (Integer) row.get("level_number");
                 detail.price = (String) row.get("price");
                 detail.quality = (Integer) row.get("quality");
@@ -238,31 +239,31 @@ public class Application extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result addDetail(Long wantedId) {
         JsonNode json = request().body().asJson();// (Detail.class);
-        Item item = Json.fromJson(json, Item.class);
-        Detail detail = item.details.get(0);
+        Detail detail = Json.fromJson(json, Detail.class);
+        Logger.info("Validating..");
+        boolean validDetail = validate(detail);
 
-        System.out.println(request().body());
-
-        long steamId = Long.parseLong(session("steamId"));
-
-        try {
-            CallableStatement cs = DB.getDataSource().getConnection().prepareCall("CALL `wanted`.`addDetail`(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            cs.setLong(1, steamId);
-            cs.setLong(2, item.wantedId);
-            cs.setInt(3, detail.quality);
-            cs.setInt(4, detail.levelNumber);
-            cs.setBoolean(5, detail.isTradable);
-            cs.setBoolean(6, detail.isCraftable);
-            cs.setLong(7, detail.craftNumber);
-            cs.setBoolean(8, detail.isGiftWrapped);
-            cs.setBoolean(9, detail.isObtained);
-            cs.setInt(10, detail.priority);
-            cs.setString(11, detail.price);
-
-            cs.execute();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if (validDetail) {
+            Logger.info("Valid input");
+            long steamId = Long.parseLong(session("steamId"));
+            Object[] params = new Object[] { steamId, wantedId, detail.quality, detail.levelNumber, detail.isTradable, detail.isCraftable, detail.craftNumber,
+                    detail.isGiftWrapped, detail.isObtained, detail.priority, detail.price };
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(DB.getDataSource());
+            SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate).withSchemaName("wanted").withProcedureName("addDetail");
+            Logger.info("Executed");
+            Map<String, Object> result = call.execute(params);
+            Logger.info("Results: {}",Json.toJson(result));
+            detail.detailId = (long) result.get("detail_id");
+            Item item = new Item();
+            item.wantedId = wantedId;
+            item.details = new ArrayList<Detail>(1);
+            item.details.add(detail);
+            return ok(Json.toJson(item));
+        } else {
+            Logger.info("Invalid input");
+            ValidationFailure error = new ValidationFailure();
+            error.error = "Invalid Request";
+            return badRequest(Json.toJson(error)); // fail
         }
         // (<{steamId bigint}>, <{wantedId bigint}>, <{quality int}>, <{level
         // smallint}>, <{isTradable tinyint}>, <{isCraftable tinyint}>,
@@ -278,7 +279,12 @@ public class Application extends Controller {
          *
          * JsonNode result = Json.toJson(1);
          */
-        return TODO;
+    }
+
+    private static boolean validate(Detail detail) {
+        // TODO Auto-generated method stub
+        Logger.info("{}",Json.toJson(detail));
+        return (detail.isCraftable != null && detail.isGiftWrapped != null && detail.isObtained != null && detail.isTradable != null && detail.craftNumber != null && detail.levelNumber != null && detail.quality != null);
     }
 
     public static Result editDetail(Long detailId) {

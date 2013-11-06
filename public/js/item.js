@@ -1,4 +1,4 @@
-var app = angular.module('wantedItem', ['wantedDialog']);
+var app = angular.module('wantedItem', [ 'wantedDialog' ]);
 
 app
     .directive(
@@ -23,7 +23,7 @@ app
                 + '<div ng-repeat="item in items | startFrom:currentPage*pageSize | limitTo:pageSize" class="panel panel-primary">'
                 + '<div class="panel-heading"><a class="pull-left" href="#">'
                 + '<img class="media-object" height="24" width="24" hspace="5" src="http://media.steampowered.com/apps/440/icons/c_ambassador_opt.5a05f0ae3486dc204d2c2e037cda748d58e6bc2b.png" alt=""/>'
-                + '</a> {{item.itemId}} <div class="btn-group btn-group-xs pull-right"><button ng-show="steamId == mySteamId" type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-plus"></span> Add Detail</button></div></div>'
+                + '</a> {{item.itemId}} <div class="btn-group btn-group-xs pull-right"><button ng-click="showAddDetail(item.wantedId)" ng-show="steamId == mySteamId" type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-plus"></span> Add Detail</button></div></div>'
                 + '<table class="table table-condensed">'
                 + '<thead>'
                 + '<tr>'
@@ -64,7 +64,7 @@ app
 
                 '</tbody>'
                 + '</table>'
-                + '</div><div wanted-dialog></div>',
+                + '</div><div wanted-dialog proposed-detail="proposedDetail" push-detail-function="pushDetailToModel"></div>',
             controller : [
                 '$scope',
                 '$http',
@@ -99,17 +99,32 @@ app
                   }
                   $scope.proposedDetail = {
                     "wantedId" : 1,
-                    "details" : [ {
-                      "quality" : 6,
-                      "levelNumber" : 100,
-                      "isTradable" : false,
-                      "isCraftable" : false,
+                    "details" : {
+                      "quality" : -1,
+                      "levelNumber" : 1,
+                      "isTradable" : 1,
+                      "isCraftable" : 1,
                       "craftNumber" : 0,
-                      "isGiftWrapped" : false,
-                      "price" : "0",
-                      "isObtained" : false,
-                      "priority" : 0
-                    } ]
+                      "isGiftWrapped" : 0,
+                      "price" : "ASK",
+                      "isObtained" : 0,
+                      "priority" : undefined
+                    }
+                  };
+
+                  $scope.pushDetailToModel = function(wantedId,details) {
+                    console.log(wantedId + "vs" +details);
+                    for (var i = 0; i < $scope.items.length; i++){
+                      if ($scope.items[i].wantedId == wantedId) {
+                        console.log("wantedId Matches!");
+                        $scope.items[i].details.push(details);
+                      } else {
+                        console.log($scope.items[i].wantedId + " vs " + wantedId);
+                      }
+                    };
+                  };
+                  $scope.showAddDetail = function(wantedId) {
+                    $scope.proposedDetail.wantedId = wantedId;
                   };
                   $scope.qualities = [ {
                     "id" : "0",
@@ -217,11 +232,11 @@ app
                   $scope.craftNumberToString = function(
                       craftNumber) {
                     if (craftNumber == -1) {
-                          return "Any";
-                        } else if (craftNumber == 0) {
-                      return "No Craft Number";
+                      return "Any";
+                    } else if (craftNumber == 0) {
+                      return "Without CraftNumber";
                     } else {
-                      return "#" + craftNumber;
+                      return "Specific CraftNumber";
                     }
                     ;
                   }
@@ -252,7 +267,8 @@ app
                     ;
                   };
                   $scope.next = function(currentPage) {
-                    if (currentPage < $scope.numberOfPages()) {
+                    if (currentPage < $scope
+                        .numberOfPages()) {
                       return $scope.currentPage++;
                     } else {
                       return $scope.currentPage;

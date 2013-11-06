@@ -7,19 +7,20 @@ app
           return {
 
             restrict : 'A',
-            //scope : true,                  //maybe this
-            //scope : {						//NOBODY KNOWS WHAT SCOPE REALLY DOES,
-                            //we all just pretend to
+            // scope : true, //maybe this
 
-             // proposedDetail : '=proposedDetail'
-            //},
+            scope : {
+              pushDetailFunction : '&',
+              proposedDetail : '='
+            },
+
             template : '<!-- Modal -->'
                 + '<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">'
                 + '<div class="modal-dialog">'
                 + '<div class="modal-content">'
                 + '<div class="modal-header">'
                 + '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'
-                + '<h4 class="modal-title" id="myModalLabel">Add Detail</h4>'
+                + '<h4 class="modal-title" id="myModalLabel">Add Detail {{proposedDetail.wantedId}}</h4>'
                 + '</div>'
                 + '<div class="modal-body">'
                 + '<form class="form-horizontal" role="form">'
@@ -29,14 +30,10 @@ app
                 + '  <!-- Single button -->'
                 + '  <div class="btn-group">'
                 + '   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'
-                + '    Action <span class="caret"></span>'
+                + '    {{qualityIdToString(proposedDetail.details.quality)}} <span class="caret"></span>'
                 + '   </button>'
                 + '   <ul class="dropdown-menu" role="menu">'
-                + '    <li><a href="javascript:;">Unique</a></li>'
-                + '    <li><a href="javascript:;">Another action</a></li>'
-                + '    <li><a href="javascript:;">Something else here</a></li>'
-                + '    <li class="divider"></li>'
-                + '    <li><a href="javascript:;">Any</a></li>'
+                + '    <li ng-repeat="quality in qualities"><a href="javascript:;" ng-click="proposedDetail.details.quality=quality.id">{{quality.name}}</a></li>'
                 + '   </ul>'
                 + '  </div>'
                 + ' </div>'
@@ -44,16 +41,17 @@ app
                 + '   <div class="form-group">'
                 + '    <label for="inputPassword3" class="col-sm-3 control-label">Level</label>'
                 + '    <div class="col-sm-9">'
-                + '    <div class="row">'
-                + '    <div class="col-lg-6">'
-                + '      <div class="input-group">'
-                + '        <span class="input-group-addon">'
-                + '          <input type="checkbox">'
-                + '        </span>'
-                + '        <input type="text" class="form-control" placeholder="Level Number" ng-model="proposedDetail.details.levelNumber">'
-                + '      </div><!-- /input-group -->'
-                + '    </div><!-- /.col-lg-6 -->'
-                + '    </div><!-- /.row -->'
+                + '<div class="input-group">'
+                + '  <div class="input-group-btn">'
+                + '    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{levelNumberToString(proposedDetail.details.levelNumber)}} <span class="caret"></span></button>'
+                + '    <ul class="dropdown-menu">'
+                + '      <li><a href="javascript:;" ng-click="proposedDetail.details.levelNumber=0">Any</a></li>'
+                + '      <li><a href="javascript:;" ng-click="proposedDetail.details.levelNumber=undefined">Specific Level</a></li>'
+                + '    </ul>'
+                + '  </div><!-- /btn-group -->'
+                + '  <input type="text" class="form-control" placeholder="Level Number #" ng-hide="proposedDetail.details.levelNumber == 0" ng-model="proposedDetail.details.levelNumber">'
+                + '</div><!-- /input-group -->'
+
                 + '     </div>'
                 + '   </div>'
                 + '    <div class="form-group">'
@@ -62,13 +60,13 @@ app
                 + '  <!-- Single button -->'
                 + '  <div class="btn-group">'
                 + '   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'
-                + '    Action <span class="caret"></span>'
+                + '    {{tradableToString(proposedDetail.details.isTradable)}} <span class="caret"></span>'
                 + '   </button>'
                 + '   <ul class="dropdown-menu" role="menu">'
-                + '    <li><a href="javascript:;">Tradable</a></li>'
-                + '    <li><a href="javascript:;">Untradable</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isTradable=1">Tradable</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isTradable=0">Untradable</a></li>'
                 + '    <li class="divider"></li>'
-                + '    <li><a href="javascript:;">Don\'t Care</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isTradable=2">Don\'t Care</a></li>'
                 + '   </ul>'
                 + '  </div>'
                 + '     </div>'
@@ -79,32 +77,32 @@ app
                 + '  <!-- Single button -->'
                 + '  <div class="btn-group">'
                 + '   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'
-                + '    Action <span class="caret"></span>'
+                + '    {{craftableToString(proposedDetail.details.isCraftable)}} <span class="caret"></span>'
                 + '   </button>'
                 + '   <ul class="dropdown-menu" role="menu">'
-                + '    <li><a href="javascript:;">Craftable</a></li>'
-                + '    <li><a href="javascript:;">Uncraftable</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isCraftable=1">Craftable</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isCraftable=0">Uncraftable</a></li>'
                 + '    <li class="divider"></li>'
-                + '    <li><a href="javascript:;">Don\'t Care</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isCraftable=2">Don\'t Care</a></li>'
                 + '   </ul>'
                 + '  </div>'
-                + '      </div>'
+                + '</div>'
                 + '   </div>'
                 + '   <div class="form-group">'
-                + '     <label for="inputPassword3" class="col-sm-3 control-label">Craft</label>'
+                + '     <label for="inputPassword3" class="col-sm-3 control-label">Craft Number</label>'
                 + '     <div class="col-sm-9">'
 
                 + '<div class="input-group">'
                 + '  <div class="input-group-btn">'
-                + '    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Action <span class="caret"></span></button>'
+                + '    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{craftNumberToString(proposedDetail.details.craftNumber)}} <span class="caret"></span></button>'
                 + '    <ul class="dropdown-menu">'
-                + '      <li><a href="#">Without Craftnumber</a></li>'
-                + '      <li><a href="#">Specific Craftnumber</a></li>'
+                + '      <li><a href="javascript:;" ng-click="proposedDetail.details.craftNumber=0">Without Craftnumber</a></li>'
+                + '      <li><a href="javascript:;" ng-click="proposedDetail.details.craftNumber=undefined">Specific Craftnumber</a></li>'
                 + '      <li class="divider"></li>'
-                + '      <li><a href="#">Don\'t Care</a></li>'
+                + '      <li><a href="javascript:;" ng-click="proposedDetail.details.craftNumber=-1">Don\'t Care</a></li>'
                 + '    </ul>'
                 + '  </div><!-- /btn-group -->'
-                + '  <input type="text" class="form-control">'
+                + '  <input type="text" class="form-control" placeholder="Craft Number #" ng-hide="proposedDetail.details.craftNumber == 0 || proposedDetail.details.craftNumber == -1" ng-model="proposedDetail.details.craftNumber">'
                 + '</div><!-- /input-group -->'
 
                 + '     </div>'
@@ -115,13 +113,13 @@ app
                 + '  <!-- Single button -->'
                 + '  <div class="btn-group">'
                 + '   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'
-                + '    Action <span class="caret"></span>'
+                + '    {{giftwrapToString(proposedDetail.details.isGiftWrapped)}} <span class="caret"></span>'
                 + '   </button>'
                 + '   <ul class="dropdown-menu" role="menu">'
-                + '    <li><a href="javascript:;">Gift Wrapped</a></li>'
-                + '    <li><a href="javascript:;">Not Gift Wrapped</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isGiftWrapped=1">Gift Wrapped</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isGiftWrapped=0">Not Gift Wrapped</a></li>'
                 + '    <li class="divider"></li>'
-                + '    <li><a href="javascript:;">Don\'t Care</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isGiftWrapped=2">Don\'t Care</a></li>'
                 + '   </ul>'
                 + '  </div>'
                 + '      </div>'
@@ -129,12 +127,24 @@ app
                 + '    <div class="form-group">'
                 + '      <label for="inputPassword3" class="col-sm-3 control-label">Price Range</label>'
                 + '     <div class="col-sm-9">'
-                + '        <input type="text" class="form-control" id="inputPassword3" placeholder="Price Range" ng-model="proposedDetail.price">'
+                + '        <input type="text" class="form-control" id="inputPassword3" placeholder="Price Range" ng-model="proposedDetail.details.price">'
                 + '      </div>'
                 + '    </div>'
-                +
-
-                '   </form>'
+                + '<div class="form-group">'
+                + '     <label for="inputPassword3" class="col-sm-3 control-label">Obtained</label>'
+                + '     <div class="col-sm-9">'
+                + '  <!-- Single button -->'
+                + '  <div class="btn-group">'
+                + '   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'
+                + '    {{obtainedToString(proposedDetail.details.isObtained)}} <span class="caret"></span>'
+                + '   </button>'
+                + '   <ul class="dropdown-menu" role="menu">'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isObtained=0">Unobtained</a></li>'
+                + '    <li><a href="javascript:;" ng-click="proposedDetail.details.isObtained=1">Obtained</a></li>'
+                + '   </ul>'
+                + '  </div>'
+                + '</div>'
+                + '   </form>'
                 + '  </div>'
                 + '   <div class="modal-footer">'
                 + '   <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
@@ -149,14 +159,17 @@ app
                 function($scope, $http) {
 
                   $scope.addDetail = function() {
-
                     url = '/api/addDetail/'
                         + $scope.proposedDetail.wantedId;
                     $http
                         .post(url,
-                            $scope.proposedDetail)
+                            $scope.proposedDetail.details)
                         .success(function(data) {
                           console.log(data);
+                          console.log("sending"+ data.wantedId+"and"+data.details[0]);
+                          $scope.pushDetailFunction(data.wantedId,data.details[0]);
+
+                          $scope.proposalState = "saved";
                         })
                         .error(
                             function(data, status,
@@ -167,15 +180,10 @@ app
                               // or server returns
                               // response with an
                               // error status.
-                              console.log(data);
-                              console.log(status);
-                              console
-                                  .log(headers);
-                              console.log(config);
+                              $scope.proposalState = "failed";
                             });
-
                   }
-
+                  $scope.proposalState = "incomplete";
                   $scope.qualities = [ {
                     "id" : "0",
                     "name" : "Normal",
@@ -282,13 +290,38 @@ app
                   $scope.craftNumberToString = function(
                       craftNumber) {
                     if (craftNumber == -1) {
-                          return "Any";
-                        } else if (craftNumber == 0) {
-                      return "No Craft Number";
+                      return "Any";
+                    } else if (craftNumber == 0) {
+                      return "Without CraftNumber";
                     } else {
-                      return "#" + craftNumber;
+                      return "Specific CraftNumber";
                     }
                     ;
+                  }
+
+                  $scope.levelNumberToString = function(
+                      levelNumber) {
+                    if (levelNumber == 0) {
+                      return "Any";
+                    } else {
+                      return "Specific Level";
+                    }
+                    ;
+                  }
+
+                  $scope.obtainedToString = function(
+                          obtained) {
+                        if (obtained == 0) {
+                          return "Unobtained";
+                        } else {
+                          return "Obtained";
+                        }
+                        ;
+                      }
+
+                  $scope.acceptScope = function(scope) {
+                    $scope.proposedDetail = scope.proposedDetail;
+                    console.log($scope);
                   }
 
                   $scope.qualityIdToString = function(inputId) {
@@ -303,9 +336,8 @@ app
 
                 } ],
             link : function(scope, iElement, iAttrs) {
-
+              // scope.acceptScope(scope);
             },
 
           }
         });
-
