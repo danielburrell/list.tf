@@ -167,7 +167,7 @@ app
                         .success(function(data) {
                           console.log(data);
                           console.log("sending"+ data.wantedId+"and"+data.details[0]);
-                          $scope.pushDetailFunction(data.wantedId,data.details[0]);
+                          $scope.pushDetailFunction({ wantedId: data.wantedId,details: data.details[0]});
 
                           $scope.proposalState = "saved";
                         })

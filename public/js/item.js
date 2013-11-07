@@ -64,7 +64,7 @@ app
 
                 '</tbody>'
                 + '</table>'
-                + '</div><div wanted-dialog proposed-detail="proposedDetail" push-detail-function="pushDetailToModel"></div>',
+                + '</div><div wanted-dialog proposed-detail="proposedDetail" push-detail-function="pushDetailToModel(wantedId, details)"></div>',
             controller : [
                 '$scope',
                 '$http',
