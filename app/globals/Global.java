@@ -81,8 +81,8 @@ public class Global extends GlobalSettings {
                     }
 
                     private void addItemToSchema(Items item) {
-                        Object[] params = new Object[] { item.getDefindex(), item.getName() };
-                        jdbcTemplate.update("CALL `wanted`.`addSchemaItem`(?, ?)", params);
+                        Object[] params = new Object[] { item.getDefindex(), item.getName(), item.getImage_url() };
+                        jdbcTemplate.update("CALL `wanted`.`addSchemaItem`(?, ?, ?)", params);
                         Logger.info("Item added {} ({})", item.getName(), item.getDefindex());
                     }
 

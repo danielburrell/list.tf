@@ -13,15 +13,14 @@ GET     /logout                         controllers.Application.logout()
 
 
 # HTML partials
-GET		/partial/list.html		controllers.Application.wantedPartial()
+GET    /partial/list.html    controllers.Application.wantedPartial()
 
 # JSON requests
 GET     /api/getWantedList/:steamId                           controllers.Application.getWantedList(steamId: Long)
 POST     /api/addDetail/:wantedId                        controllers.Application.addDetail(wantedId: Long)
 POST     /api/editDetail/detailId/:detailId                           controllers.Application.editDetail(detailId: Long)
-POST     /api/deleteDetail/detailId/:detailId                           controllers.Application.deleteDetail(detailId: Long)
-POST     /api/markAsObtained/detailId/:detailId                           controllers.Application.markAsObtained(detailId: Long)
-POST     /api/markAsUnobtained/detailId/:detailId                           controllers.Application.markAsUnobtained(detailId: Long)
+POST     /api/deleteDetail/:detailId                           controllers.Application.deleteDetail(detailId: Long)
+POST     /api/markAs/:detailId/:state                           controllers.Application.markAs(detailId: Long, state: Long)
 GET     /loginStatus                         controllers.Application.loginStatus()
 
 # Map static resources from the /public folder to the /assets URL path

@@ -29,6 +29,10 @@ public class Item extends Model {
 
     public Long itemId;
 
+    public String name;
+
+    public String image;
+
     @OneToMany(cascade=CascadeType.ALL)
     public List<Detail> details;
 
