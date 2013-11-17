@@ -341,17 +341,18 @@ BEGIN
 END$$
 
 DELIMITER ;
-GRANT USAGE ON *.* TO pwanted;
-GRANT EXECUTE ON procedure `wanted`.`addDetail` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`addSchemaItem` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`addSchemaVersion` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`createNewUser` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`deleteDetail` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`editState` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`getSchema` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`getWantedList` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`getWelcomeStatus` TO 'pwanted';
-GRANT EXECUTE ON procedure `wanted`.`updateUserItems` TO 'pwanted';
+
+GRANT USAGE ON *.* TO pwanted@localhost;
+GRANT EXECUTE ON procedure `wanted`.`addDetail` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`addSchemaItem` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`addSchemaVersion` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`createNewUser` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`deleteDetail` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`editState` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`getSchema` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`getWantedList` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`getWelcomeStatus` TO 'pwanted'@'localhost';
+GRANT EXECUTE ON procedure `wanted`.`updateUserItems` TO 'pwanted'@'localhost';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
