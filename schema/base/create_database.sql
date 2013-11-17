@@ -119,6 +119,7 @@ DROP procedure IF EXISTS `wanted`.`addDetail`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `addDetail`(steam_id bigint, wanted_id bigint, quality int, level_number smallint, is_tradable tinyint, is_craftable tinyint, craft_number bigint, is_gift_wrapped tinyint, is_obtained tinyInt, priority int, price varchar(45), out detail_id bigint  )
+SQL SECURITY INVOKER
 BEGIN
 INSERT INTO `wanted`.`detail` (
 `item_wanted_id`,
@@ -146,6 +147,7 @@ DROP procedure IF EXISTS `wanted`.`updateUserItems`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `updateUserItems`(steam_id bigint, out affected_rows int)
+SQL SECURITY INVOKER
 BEGIN
 
 insert into `wanted`.`item` (steam_user_steam_id, item_id, state)
@@ -170,6 +172,7 @@ DROP procedure IF EXISTS `wanted`.`createNewUser`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `createNewUser` (steam_id bigint)
+SQL SECURITY INVOKER
 BEGIN
 select @schema_id :=  max(schema_id)  from `wanted`.`schema_history`;
 insert into `wanted`.`steam_user` (steam_id, schema_id) values (steam_id, @schema_id);
@@ -188,6 +191,7 @@ DROP procedure IF EXISTS `wanted`.`getWantedList`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `getWantedList` (steam_id bigint)
+SQL SECURITY INVOKER
 BEGIN
   select
     su.steam_id,
@@ -228,6 +232,7 @@ DROP procedure IF EXISTS `wanted`.`addSchemaItem`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `addSchemaItem` (item_id bigint, item_name varchar(100), item_image varchar(150))
+SQL SECURITY INVOKER
 BEGIN
   INSERT INTO `wanted`.`item_schema` (`item_id`, `item_name`, `item_image`) VALUES (item_id, item_name, item_image);
 END$$
@@ -244,6 +249,7 @@ DROP procedure IF EXISTS `wanted`.`addSchemaVersion`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `addSchemaVersion` (date_updated timestamp)
+SQL SECURITY INVOKER
 BEGIN
 INSERT INTO `wanted`.`schema_history` (`date_updated`) VALUES (date_updated);
 END$$
@@ -260,6 +266,7 @@ DROP procedure IF EXISTS `wanted`.`getSchema`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `getSchema` ()
+SQL SECURITY INVOKER
 BEGIN
   select item_id, item_name from wanted.item_schema;
 END$$
@@ -276,6 +283,7 @@ DROP procedure IF EXISTS `wanted`.`getWelcomeStatus`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `getWelcomeStatus` (steam_id bigint, out welcome_status int)
+SQL SECURITY INVOKER
 BEGIN
   declare userExists int;
   select count(1) into userExists from `wanted`.`steam_user` as su where su.steam_id = steam_id;
@@ -318,6 +326,7 @@ DROP procedure IF EXISTS `wanted`.`deleteDetail`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `deleteDetail` (steam_id bigint, detail_id bigint, out deleted_row_count bigint)
+SQL SECURITY INVOKER
 BEGIN
   delete detail from detail join item on item.wanted_id = detail.item_wanted_id where item.steam_user_steam_id = steam_id and detail.detail_id = detail_id;
   select ROW_COUNT() into deleted_row_count;
@@ -335,13 +344,13 @@ DROP procedure IF EXISTS `wanted`.`editState`;
 DELIMITER $$
 USE `wanted`$$
 CREATE PROCEDURE `editState` (steam_id bigint, wanted_id bigint, state tinyint, out updated_row_count bigint)
+SQL SECURITY INVOKER
 BEGIN
   update item i set i.state = state where i.steam_user_steam_id = steam_id and i.wanted_id = wanted_id;
   select ROW_COUNT() into updated_row_count;
 END$$
 
 DELIMITER ;
-
 GRANT USAGE ON *.* TO pwanted@localhost;
 GRANT EXECUTE ON procedure `wanted`.`addDetail` TO 'pwanted'@'localhost';
 GRANT EXECUTE ON procedure `wanted`.`addSchemaItem` TO 'pwanted'@'localhost';
