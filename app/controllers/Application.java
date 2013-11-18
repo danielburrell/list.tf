@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class Application extends Controller {
 
+  public static String domain = System.getProperty("domain");
   public static Result index() {
     return ok(index.render(""));
   }
@@ -137,8 +138,8 @@ public class Application extends Controller {
 
     try {
       OpenIdManager manager = new OpenIdManager();
-      manager.setReturnTo("http://localhost:8010/openIDCallback");
-      manager.setRealm("http://localhost:8010/");
+      manager.setReturnTo("http://"+domain+"/openIDCallback");
+      manager.setRealm("http://"+domain+"/");
 
       Endpoint endpoint = manager.lookupEndpoint("http://steamcommunity.com/openid");
       Association association = manager.lookupAssociation(endpoint);
