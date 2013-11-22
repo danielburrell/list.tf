@@ -34,9 +34,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class Application extends Controller {
 
-  public static String domain = System.getProperty("domain");
+  public static String domain = getDomain();
+
   public static Result index() {
     return ok(index.render(""));
+  }
+
+  private static String getDomain() {
+    // TODO Auto-generated method stub
+    String d = System.getProperty("domain");
+    if (d == null) {
+      return "localhost:8010";
+    } else {
+      return d;
+    }
   }
 
   public static Result privacy() {
@@ -53,7 +64,8 @@ public class Application extends Controller {
 
   public static Result logout() {
     session().clear();
-    return ok();
+    flash("success", "You have logged out");
+    return redirect("/");
   }
 
   public static Result loginStatus() {
@@ -85,20 +97,25 @@ public class Application extends Controller {
           int userStatus = getUserWelcomeStatus(steamId);
           switch (userStatus) {
           case 0:
-            return ok(index.render(""));
+
+            flash("success", "Welcome. Since this is your first time, we created some items to get you started");
+            return redirect("/#/id/" + steamId + "/");
 
           case 1:
-            return ok(index.render(""));// "Oh hey, you're back! New items have been released since you were last here. Go! Go! Go!"
+            // flash ""
+            flash("success", "Welcome back. New items have been released");
+            return redirect("/#/id/" + steamId + "/");// "Oh hey, you're back! New items have been released since you were last here. Go! Go! Go!"
 
           case 2:
-            return ok(index.render("")); // "Oh hey, you're back! No new items have been released since you were last here."
+            flash("success", "Welcome back. No new items have been released since you were last here.");
+            return redirect("/#/id/" + steamId + "/"); // "Oh hey, you're back! No new items have been released since you were last here."
 
           default:
             return ok("What is this I don't even..");
           }
 
         } else {
-          return ok("Doesn't look like logging in worked. Maybe try again?");
+          return ok("Doesn't look like login in worked. Maybe try again?");
         }
 
       }
@@ -138,15 +155,15 @@ public class Application extends Controller {
 
     try {
       OpenIdManager manager = new OpenIdManager();
-      manager.setReturnTo("http://"+domain+"/openIDCallback");
-      manager.setRealm("http://"+domain+"/");
+      manager.setReturnTo("http://" + domain + "/openIDCallback");
+      manager.setRealm("http://" + domain + "/");
 
       Endpoint endpoint = manager.lookupEndpoint("http://steamcommunity.com/openid");
       Association association = manager.lookupAssociation(endpoint);
       String url = manager.getAuthenticationUrl(endpoint, association);
       return redirect(url);
     } catch (Exception e) {
-      return ok("Steam community is down :(");
+      return redirect("/#/steamDown");
     }
 
     /*

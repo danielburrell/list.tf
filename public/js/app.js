@@ -12,6 +12,7 @@ angular.module('myApp', [
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/id/:id/', {templateUrl: '/assets/partials/partial1.html', controller: 'MyCtrl1'});
   $routeProvider.when('/', {templateUrl: '/assets/partials/partial2.html', controller: 'MyCtrl1'});
+  $routeProvider.when('/steamDown', {templateUrl: '/assets/partials/partial3.html', controller: 'MyCtrl1'});
   //$routeProvider.when('/openIDCallback', {templateUrl: '/assets/partials/partial2.html', controller: 'MyCtrl3'});
   $routeProvider.otherwise({redirectTo: '/'});
 }]);

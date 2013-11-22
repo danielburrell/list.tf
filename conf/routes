@@ -11,7 +11,6 @@ GET     /openIDCallback                         controllers.Application.openIDCa
 GET     /login                         controllers.Application.login()
 GET     /logout                         controllers.Application.logout()
 
-
 # HTML partials
 GET    /partial/list.html    controllers.Application.wantedPartial()
 
