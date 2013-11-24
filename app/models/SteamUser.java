@@ -25,6 +25,10 @@ public class SteamUser extends Model{
 
     public Long schemaId;
 
+    public String name;
+
+    public String avatar;
+
     @OneToMany(cascade=CascadeType.ALL)
     public List<Item> item;
 

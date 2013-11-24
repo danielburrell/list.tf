@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,36 +20,36 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import play.Logger;
+import play.Play;
 import play.db.DB;
 import play.libs.F.Function;
 import play.libs.F.Promise;
 import play.libs.Json;
 import play.libs.OpenID;
+import play.libs.WS;
 import play.libs.OpenID.UserInfo;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import uk.co.solong.tf2.playersummaries.PlayerSummaryResult;
+import uk.co.solong.tf2.schema.Schema;
 import views.html.index;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Application extends Controller {
 
-  public static String domain = getDomain();
+  public static String steamApiKey = Play.application().configuration().getString("apiKey");
+  public static String playerSummaryUrl = Play.application().configuration().getString("playerSummary");
+  public static String domain = Play.application().configuration().getString("domain");
 
   public static Result index() {
     return ok(index.render(""));
   }
 
-  private static String getDomain() {
-    // TODO Auto-generated method stub
-    String d = System.getProperty("domain");
-    if (d == null) {
-      return "localhost:8010";
-    } else {
-      return d;
-    }
-  }
 
   public static Result privacy() {
     return TODO;
@@ -150,6 +151,40 @@ public class Application extends Controller {
     });
 
   }
+
+  public static Result importItems() {
+    //get the steamid
+    //fetch items from backpack
+    //error if not public
+
+    //otherwise, get all wanted items,
+    //for each item in backpack, call the shouldAdd() function passing in the wanted list.
+    //if it returns true, then call the importSingleItem passing in the item
+    return TODO;
+  }
+
+
+  public static Promise<Result> getName(Long steamId) {
+    Promise<Result> p = WS.url(playerSummaryUrl).setQueryParameter("key", steamApiKey).setQueryParameter("steamIds", steamId.toString()).get().map(new Function<WS.Response, Result>() {
+      public Result apply(WS.Response response) {
+        try {
+        String node = response.getBody();
+        ObjectMapper om = new ObjectMapper();
+        PlayerSummaryResult s = om.readValue(node, PlayerSummaryResult.class);
+        SteamUser user = new SteamUser();
+        user.name = s.getResponse().getPlayers().get(0).getPersonaname();
+        user.avatar = s.getResponse().getPlayers().get(0).getAvatarmedium();
+        JsonNode result = Json.toJson(user);
+        return ok(result);
+        } catch (Exception e) {
+          return ok("name Unavailable");
+        }
+      }
+    });
+    return p;
+  }
+
+
 
   public static Result login() {
 

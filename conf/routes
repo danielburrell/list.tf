@@ -21,6 +21,7 @@ POST     /api/editDetail/detailId/:detailId                           controller
 POST     /api/deleteDetail/:detailId                           controllers.Application.deleteDetail(detailId: Long)
 POST     /api/markAs/:detailId/:state                           controllers.Application.markAs(detailId: Long, state: Long)
 GET     /loginStatus                         controllers.Application.loginStatus()
+GET     /getName/:steamId                         controllers.Application.getName(steamId: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -65,6 +65,20 @@ app.directive('wantedItem', function() {
         ;
       };
 
+
+      $scope.pushStateChangeToModel = function(wantedId, state) {
+        console.log(wantedId + "vs" + state);
+        for ( var i = 0; i < $scope.items.length; i++) {
+          if ($scope.items[i].wantedId == wantedId) {
+            console.log("wantedId Matches!");
+            $scope.items[i].state = state;
+          } else {
+            console.log($scope.items[i].wantedId + " vs " + wantedId);
+          }
+        }
+        ;
+      };
+
       $scope.pushDetailToModel = function(wantedId, details) {
         console.log(wantedId + "vs" + details);
         for ( var i = 0; i < $scope.items.length; i++) {
@@ -151,10 +165,17 @@ app.directive('wantedItem', function() {
         }
       };
 
+
+
       $scope.markAs = function(wantedId, state) {
         url = '/api/markAs/' + wantedId + '/'+ state;
         $http.post(url).success(function(data) {
           console.log(data);
+          console.log(wantedId);
+          console.log(state);
+          $scope.pushStateChangeToModel(wantedId,
+            state
+          );
         }).error(function(data, status, headers, config) {
           // TODO: Error
           // handling for add

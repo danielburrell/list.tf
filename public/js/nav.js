@@ -5,12 +5,15 @@ app.directive('wantedNav', function() {
 
     scope : {
       mySteamId : '=mySteamId',
-      loggedIn : '=loggedIn'
+      loggedIn : '=loggedIn',
     },
 
     templateUrl : '/assets/templates/nav.html',
 
-    controller : [ '$scope', '$http', function($scope, $http) {
+    controller : [ '$scope', '$http', '$routeParams', '$location', function($scope, $http, $routeParams, $location) {
+      //$scope.routeParams = $routeParams;
+      $scope.routeParams = $routeParams;
+      $scope.locationPath = $location.path();
     } ],
 
     link : function(scope, iElement, iAttrs) {
