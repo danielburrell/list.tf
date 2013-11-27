@@ -8,8 +8,9 @@ GET     /                           controllers.Application.privacy()
 GET     /                           controllers.Application.about()
 GET     /id/:steamId/                           controllers.Application.wanted(steamId: Long)
 GET     /openIDCallback                         controllers.Application.openIDCallback()
-GET     /login                         controllers.Application.login()
-GET     /logout                         controllers.Application.logout()
+GET     /login                         controllers.Application.index()
+GET     /logout                         controllers.Application.index()
+GET     /about                         controllers.Application.index()
 
 # HTML partials
 GET    /partial/list.html    controllers.Application.wantedPartial()
@@ -22,6 +23,10 @@ POST     /api/deleteDetail/:detailId                           controllers.Appli
 POST     /api/markAs/:detailId/:state                           controllers.Application.markAs(detailId: Long, state: Long)
 GET     /loginStatus                         controllers.Application.loginStatus()
 GET     /getName/:steamId                         controllers.Application.getName(steamId: Long)
+
+GET     /api/login                         controllers.Application.login()
+GET     /api/logout                         controllers.Application.logout()
+GET     /api/openIDCallback                         controllers.Application.openIDCallbackAPI()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

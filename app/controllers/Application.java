@@ -50,7 +50,6 @@ public class Application extends Controller {
     return ok(index.render(""));
   }
 
-
   public static Result privacy() {
     return TODO;
   }
@@ -66,7 +65,7 @@ public class Application extends Controller {
   public static Result logout() {
     session().clear();
     flash("success", "You have logged out");
-    return redirect("/");
+    return ok(index.render(""));
   }
 
   public static Result loginStatus() {
@@ -85,6 +84,37 @@ public class Application extends Controller {
     }
   }
 
+  public static Result openIDCallbackAPI() {
+    switch (session("success")) {
+    case "0": {
+      String url = "/id/" + session("steamId") + "/";
+      JsonNode result = Json.newObject().put("successUrl", url);
+      return ok(result);
+    }
+    case "1": {
+      String url = "/id/" + session("steamId") + "/";
+      JsonNode result = Json.newObject().put("successUrl", url);
+      return ok(result);
+    }
+    case "2": {
+      String url = "/id/" + session("steamId") + "/";
+      JsonNode result = Json.newObject().put("successUrl", url);
+      return ok(result);
+    }
+    case "-1": {
+      String url = "/loginFailed/";
+      JsonNode result = Json.newObject().put("successUrl", url);
+      return ok(result);
+    }
+    default : {
+      String url = "/iHaveNoIdea/";
+      JsonNode result = Json.newObject().put("successUrl", url);
+      return ok(result);
+    }
+    }
+
+  }
+
   public static Promise<Result> openIDCallback() {
     Promise<UserInfo> d = OpenID.verifiedId();
 
@@ -98,25 +128,23 @@ public class Application extends Controller {
           int userStatus = getUserWelcomeStatus(steamId);
           switch (userStatus) {
           case 0:
-
-            flash("success", "Welcome. Since this is your first time, we created some items to get you started");
-            return redirect("/#/id/" + steamId + "/");
-
+            session("success", "0");
+            return redirect("/id/"+steamId+"/");
           case 1:
-            // flash ""
-            flash("success", "Welcome back. New items have been released");
-            return redirect("/#/id/" + steamId + "/");// "Oh hey, you're back! New items have been released since you were last here. Go! Go! Go!"
-
+            session("success", "1");
+            return redirect("/id/"+steamId+"/");
           case 2:
-            flash("success", "Welcome back. No new items have been released since you were last here.");
-            return redirect("/#/id/" + steamId + "/"); // "Oh hey, you're back! No new items have been released since you were last here."
-
+            session("success", "2");
+            return redirect("/id/"+steamId+"/");
           default:
-            return ok("What is this I don't even..");
+            session("success", "-2");
+            return redirect("/id/"+steamId+"/");
           }
 
         } else {
-          return ok("Doesn't look like login in worked. Maybe try again?");
+          // something went wrong
+          session("success", "-1");
+          return ok(index.render(""));
         }
 
       }
@@ -153,41 +181,40 @@ public class Application extends Controller {
   }
 
   public static Result importItems() {
-    //get the steamid
-    //fetch items from backpack
-    //error if not public
+    // get the steamid
+    // fetch items from backpack
+    // error if not public
 
-    //otherwise, get all wanted items,
-    //for each item in backpack, call the shouldAdd() function passing in the wanted list.
-    //if it returns true, then call the importSingleItem passing in the item
+    // otherwise, get all wanted items,
+    // for each item in backpack, call the shouldAdd() function passing in the wanted list.
+    // if it returns true, then call the importSingleItem passing in the item
     return TODO;
   }
 
-
   public static Promise<Result> getName(Long steamId) {
-    Promise<Result> p = WS.url(playerSummaryUrl).setQueryParameter("key", steamApiKey).setQueryParameter("steamIds", steamId.toString()).get().map(new Function<WS.Response, Result>() {
-      public Result apply(WS.Response response) {
-        try {
-        String node = response.getBody();
-        ObjectMapper om = new ObjectMapper();
-        PlayerSummaryResult s = om.readValue(node, PlayerSummaryResult.class);
-        SteamUser user = new SteamUser();
-        user.name = s.getResponse().getPlayers().get(0).getPersonaname();
-        user.avatar = s.getResponse().getPlayers().get(0).getAvatarmedium();
-        JsonNode result = Json.toJson(user);
-        return ok(result);
-        } catch (Exception e) {
-          return ok("name Unavailable");
-        }
-      }
-    });
+    Promise<Result> p = WS.url(playerSummaryUrl).setQueryParameter("key", steamApiKey).setQueryParameter("steamIds", steamId.toString()).get()
+        .map(new Function<WS.Response, Result>() {
+          public Result apply(WS.Response response) {
+            try {
+              String node = response.getBody();
+              ObjectMapper om = new ObjectMapper();
+              PlayerSummaryResult s = om.readValue(node, PlayerSummaryResult.class);
+              SteamUser user = new SteamUser();
+              user.name = s.getResponse().getPlayers().get(0).getPersonaname();
+              user.avatar = s.getResponse().getPlayers().get(0).getAvatarmedium();
+              JsonNode result = Json.toJson(user);
+              return ok(result);
+            } catch (Exception e) {
+              return ok("name Unavailable");
+            }
+          }
+        });
     return p;
   }
 
-
-
   public static Result login() {
 
+    Logger.info("Logging in");
     try {
       OpenIdManager manager = new OpenIdManager();
       manager.setReturnTo("http://" + domain + "/openIDCallback");
@@ -196,9 +223,12 @@ public class Application extends Controller {
       Endpoint endpoint = manager.lookupEndpoint("http://steamcommunity.com/openid");
       Association association = manager.lookupAssociation(endpoint);
       String url = manager.getAuthenticationUrl(endpoint, association);
-      return redirect(url);
+      JsonNode result = Json.newObject().put("steamUrl", url);
+      return ok(result);
+
     } catch (Exception e) {
-      return redirect("/#/steamDown");
+      JsonNode result = Json.newObject().put("steamDownUrl", "/steamDown");
+      return ok(result);
     }
 
     /*
