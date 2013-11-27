@@ -26,11 +26,11 @@ angular.module('myApp.controllers', [ 'wantedItem', 'wantedNav' ]).controller('M
 
       }
 
+      $scope.id = $routeParams.id;
       $scope.getLoginStatus();
       $scope.getnameStatus();
       // maybe put this inside the widget
 
-      $scope.id = $routeParams.id;
       console.log($routeParams);
     } ]).controller('MyCtrl2', [ function() {
 
