@@ -11,6 +11,7 @@ GET     /openIDCallback                         controllers.Application.openIDCa
 GET     /login                         controllers.Application.index()
 GET     /logout                         controllers.Application.index()
 GET     /about                         controllers.Application.index()
+GET     /steamDown                         controllers.Application.index()
 
 # HTML partials
 GET    /partial/list.html    controllers.Application.wantedPartial()

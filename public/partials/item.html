@@ -1,20 +1,11 @@
 <div>
   <div wanted-nav logged-in="loggedIn" my-steam-id="mySteamId" ></div>
   <div class="well">
-    <h1>{{name}}'s most wanted.</h1>
+    <h1><img src="{{avatar}}" alt="..." class="img-thumbnail"/>&nbsp;{{name}}'s most wanted.</h1>
     <div class="alert alert-danger">Custom warning message here.</div>
   </div>
   <div class="well">
     <div wanted-item steam-id="id" my-steam-id="mySteamId"></div>
   </div>
-  <footer class="footer">
-    <center>
-      <p>&copy; 2013 Wanted.tf All rights reserved.</p>
-      <p>Powered by Steam. Not affiliated with Steam.</p>
-      <p>
-        <a href="/privacy">Privacy Policy</a>
-      </p>
-      <a href="/privacy"> </a>
-    </center>
-  </footer>
+  <div wanted-footer></div>
 </div>

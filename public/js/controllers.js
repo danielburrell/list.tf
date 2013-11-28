@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-angular.module('myApp.controllers', [ 'wantedItem', 'wantedNav' ]).controller('MyCtrl1',
+angular.module('myApp.controllers', [ 'wantedItem', 'wantedNav', 'wantedFooter' ]).controller('MyCtrl1',
     [ '$routeParams', '$scope', '$http', function($routeParams, $scope, $http) {
 
 
@@ -22,6 +22,7 @@ angular.module('myApp.controllers', [ 'wantedItem', 'wantedNav' ]).controller('M
 
         $http.get('/getName/'+$scope.id).success(function(data) {
           $scope.name = data.name;
+          $scope.avatar = data.avatar;
         });
 
       }

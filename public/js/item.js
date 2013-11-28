@@ -19,23 +19,34 @@ app.directive('wantedItem', function() {
         });
       }
 
-
-      $scope.selectedState = [1,2];
+      $scope.selectedState = [ 1, 2 ];
       $scope.adjustFilter = function(filter) {
-          filter.value = !filter.value;
-          if (filter.value) {
-            $scope.selectedState.push(filter.key);
-          } else {
-            $scope.currentPage = 0;
-            var index = $scope.selectedState.indexOf(filter.key);
-            $scope.selectedState.splice(index, 1);
-          }
+        filter.value = !filter.value;
+        if (filter.value) {
+          $scope.selectedState.push(filter.key);
+        } else {
+          $scope.currentPage = 0;
+          var index = $scope.selectedState.indexOf(filter.key);
+          $scope.selectedState.splice(index, 1);
+        }
       }
       $scope.filter = {
-        "obtained" : { "value" : false, "key" : 3 },
-        "unobtained" : { "value" : true, "key" : 1 },
-        "unwanted" : { "value" : false, "key" : 0 },
-        "unknown" : { "value" : true, "key" : 2 },
+        "obtained" : {
+          "value" : false,
+          "key" : 3
+        },
+        "unobtained" : {
+          "value" : true,
+          "key" : 1
+        },
+        "unwanted" : {
+          "value" : false,
+          "key" : 0
+        },
+        "unknown" : {
+          "value" : true,
+          "key" : 2
+        },
       }
 
       $scope.proposedDetail = {
@@ -57,7 +68,6 @@ app.directive('wantedItem', function() {
         for ( var i = 0; i < $scope.items.length; i++) {
           for ( var j = 0; j < $scope.items[i].details.length; j++) {
             if ($scope.items[i].details[j].detailId == detailId) {
-              console.log("detailId Matches!");
               $scope.items[i].details.splice(j, 1);
             }
           }
@@ -65,28 +75,20 @@ app.directive('wantedItem', function() {
         ;
       };
 
-
       $scope.pushStateChangeToModel = function(wantedId, state) {
-        console.log(wantedId + "vs" + state);
         for ( var i = 0; i < $scope.items.length; i++) {
           if ($scope.items[i].wantedId == wantedId) {
-            console.log("wantedId Matches!");
             $scope.items[i].state = state;
-          } else {
-            console.log($scope.items[i].wantedId + " vs " + wantedId);
+            $scope.items[i].recentlyChanged = 1;
           }
         }
         ;
       };
 
       $scope.pushDetailToModel = function(wantedId, details) {
-        console.log(wantedId + "vs" + details);
         for ( var i = 0; i < $scope.items.length; i++) {
           if ($scope.items[i].wantedId == wantedId) {
-            console.log("wantedId Matches!");
             $scope.items[i].details.push(details);
-          } else {
-            console.log($scope.items[i].wantedId + " vs " + wantedId);
           }
         }
         ;
@@ -165,17 +167,13 @@ app.directive('wantedItem', function() {
         }
       };
 
-
-
       $scope.markAs = function(wantedId, state) {
-        url = '/api/markAs/' + wantedId + '/'+ state;
+        url = '/api/markAs/' + wantedId + '/' + state;
         $http.post(url).success(function(data) {
           console.log(data);
           console.log(wantedId);
           console.log(state);
-          $scope.pushStateChangeToModel(wantedId,
-            state
-          );
+          $scope.pushStateChangeToModel(wantedId, state);
         }).error(function(data, status, headers, config) {
           // TODO: Error
           // handling for add
@@ -280,6 +278,9 @@ app.directive('wantedItem', function() {
 });
 app.filter('startFrom', function() {
   return function(input, start) {
+    if (input == undefined) {
+      return [];
+    }
     start = +start; // parse to int
     return input.slice(start);
   }
@@ -288,10 +289,11 @@ app.filter('stateFilter', [ function() {
   return function(items, selectedState) {
     if (!angular.isUndefined(items) && !angular.isUndefined(selectedState) && selectedState.length > 0) {
       var tempItems = [];
-      angular.forEach(selectedState, function(state) {
-        angular.forEach(items, function(item) {
-          if (angular.equals(item.state, state)) {
+      angular.forEach(items, function(item) {
+        selectedState.some(function(state) {
+          if (angular.equals(item.state, state) || item.recentlyChanged != undefined) {
             tempItems.push(item);
+            return true;
           }
         });
       });

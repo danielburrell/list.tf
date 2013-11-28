@@ -13,7 +13,7 @@ config(['$routeProvider','$locationProvider', function($routeProvider, $location
   $locationProvider.html5Mode(true);
   $routeProvider.when('/id/:id/', {templateUrl: '/assets/partials/item.html', controller: 'MyCtrl1'});
   $routeProvider.when('/', {templateUrl: '/assets/partials/home.html', controller: 'MyCtrl1'});
-  $routeProvider.when('/steamDown', {templateUrl: '/assets/partials/partial3.html', controller: 'MyCtrl1'});
+  $routeProvider.when('/steamDown', {templateUrl: '/assets/partials/steamDown.html', controller: 'MyCtrl1'});
   $routeProvider.when('/login', {templateUrl: '/assets/partials/login.html', controller: 'LoginCtrl'});
   $routeProvider.when('/logout', {templateUrl: '/assets/partials/logout.html', controller: 'LogoutCtrl'});
   $routeProvider.when('/about', {templateUrl: '/assets/partials/about.html', controller: 'AboutCtrl'});

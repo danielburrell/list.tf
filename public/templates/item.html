@@ -15,6 +15,11 @@
   <div class="panel-heading">
     <a class="pull-left" href="#"> <img class="media-object" height="24" width="24" hspace="5" src="{{item.image}}" alt="" />
     </a> {{item.name}}
+
+    <span class="glyphicon glyphicon-thumbs-up" ng-show="item.state == filter.unobtained.key"></span>
+    <span class="glyphicon glyphicon-thumbs-down" ng-show="item.state == filter.unwanted.key"></span>
+    <span class="glyphicon glyphicon-ok" ng-show="item.state == filter.obtained.key"></span>
+    <span class="glyphicon glyphicon-question-sign" ng-show="item.state == filter.unknown.key"></span>
     <div class="btn-group btn-group-xs pull-right" ng-show="steamId == mySteamId">
 
     <div class="btn-group btn-group-xs" >
