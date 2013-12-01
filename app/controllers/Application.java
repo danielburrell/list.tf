@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import models.DeleteError;
 import models.Detail;
@@ -492,17 +493,17 @@ public class Application extends Controller {
         currentItem = item;
       }
 
-      Long detailId = (Long) row.get("detail_id");
+      Object detailId = row.get("detail_id");
       if (detailId != null) {
         Detail detail = new Detail();
-        detail.detailId = detailId;
+        detail.detailId = (Long) detailId;
         detail.craftNumber = (Long) row.get("craft_number");
         detail.isCraftable = (Integer) row.get("is_craftable");
         detail.isGiftWrapped = (Integer) row.get("is_gift_wrapped");
         detail.isObtained = (Boolean) row.get("is_obtained");
         detail.isTradable = (Integer) row.get("is_tradable");
         detail.levelNumber = (Integer) row.get("level_number");
-        detail.price = (String) row.get("price");
+        detail.price = Objects.toString(row.get("price"));
         detail.quality = (Integer) row.get("quality");
         currentItem.details.add(detail);
       }
