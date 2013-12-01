@@ -1,5 +1,8 @@
 package controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,11 +27,13 @@ import play.Play;
 import play.db.DB;
 import play.libs.F.Function;
 import play.libs.F.Promise;
+import play.libs.F.Tuple;
 import play.libs.Json;
 import play.libs.OpenID;
 import play.libs.OpenID.UserInfo;
 import play.libs.WS;
 import play.mvc.BodyParser;
+import play.mvc.Content;
 import play.mvc.Controller;
 import play.mvc.Result;
 import uk.co.solong.tf2.playeritems.Attributes;
@@ -115,6 +120,29 @@ public class Application extends Controller {
     }
     }
 
+  }
+
+  public static Result markImpossibleHistoric() throws FileNotFoundException {
+
+    File f = Play.application().getFile("/reference/historic.json");
+    FileInputStream fis = new FileInputStream(f);
+
+    JsonNode historic = Json.parse(fis);
+    Map<String, String> map = Json.fromJson(historic, Map.class);
+
+    Long steamId = Long.parseLong(session("steamId"));
+    SteamUser s = getItemsForPlayer(steamId);
+
+    for (String item : map.keySet()) {
+      for (Item backpackItem : s.item) {
+        if (backpackItem.itemId.equals(Long.parseLong(item))) {
+          setItemState(backpackItem.wantedId, 0L);
+        }
+      }
+    }
+    ObjectNode result = Json.newObject();
+    result.put("success", "Historic items marked");
+    return ok(result);
   }
 
   public static Promise<Result> openIDCallback() {
@@ -618,6 +646,5 @@ public class Application extends Controller {
     long rowCount = (long) result.get("updated_row_count");
     return rowCount;
   }
-
 
 }

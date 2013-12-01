@@ -84,6 +84,18 @@ angular.module('myApp.controllers', [ 'wantedItem', 'wantedNav', 'wantedFooter' 
     //$scope.asyncLoop();
   }
 
+  $scope.historicUnwanted = function() {
+    $scope.working = true;
+    $('.historicButton').button('loading');
+    $http.get('/api/markImpossibleHistoric').success(function(data) {
+      if (typeof data.success != 'undefined') {
+        $scope.historicSuccess = true;
+      }
+    });
+    //$scope.asyncLoop();
+  }
+
+
  /* $scope.counter = 0;
   $scope.asyncLoop = function() {
 

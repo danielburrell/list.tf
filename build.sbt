@@ -18,5 +18,6 @@ libraryDependencies ++= Seq(
 play.Project.playJavaSettings
 
 mappings in Universal += {
-  file("schema/base/create_database.sql") -> "schema/base/create_database.sql"
+  file("schema/base/create_database.sql") -> "schema/base/create_database.sql",
+  file("reference/historic.json") -> "reference/historic.json"
 }

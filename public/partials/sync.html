@@ -16,5 +16,20 @@
       <button ng-show="syncSuccess" type="button" class="btn btn-success">Sync Successful!</button>
     </div>
   </div>
+  <div class="well">
+    Many items in TF2 are awarded for one-time events which will never occur again. For example Tournament Medals.
+    <p>Click the sync button below to mark these items as unwanted</p>
+    <div class="btn-group btn-group-lg">
+      <button ng-show="!historicSuccess" ng-click="historicUnwanted()" type="button" data-loading-text="Marking unobtainable historic items as unwanted" class="historicButton btn btn-danger">Mark Unobtainable Historic Items As Unwanted</button>
+    </div>
+    <!--  div ng-show="working" class="progress progress-striped active">
+      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="counter" aria-valuemin="0" aria-valuemax="100" style="width: {{counter}}%">
+        <span class="sr-only">45% Complete</span>
+      </div>
+    </div -->
+    <div class="btn-group btn-group-lg">
+      <button ng-show="historicSuccess" type="button" class="btn btn-success">Marked Historic Items as Unwanted!</button>
+    </div>
+  </div>
   <div wanted-footer></div>
 </div>

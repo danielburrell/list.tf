@@ -1,84 +1,83 @@
 <center>
   <div class="btn-group">
     <div ng-click="adjustFilter(filter.unobtained)" ng-class="{true : 'btn btn-primary active',false : 'btn btn-default'}[filter.unobtained.value]">
-      Wanted </div> <div ng-click="adjustFilter(filter.unknown)" ng-class="{true : 'btn btn-warning active',false : 'btn btn-default'}[filter.unknown.value]">
-      Unknown </div> <div ng-click="adjustFilter(filter.obtained)" ng-class="{true : 'btn btn-success active',false : 'btn btn-default'}[filter.obtained.value]">
-      Complete </div> <div ng-click="adjustFilter(filter.unwanted)" ng-class="{true : 'btn btn-danger active',false : 'btn btn-default'}[filter.unwanted.value]">
-      Unwanted </div>
+      Wanted</div>
+    <div ng-click="adjustFilter(filter.unknown)" ng-class="{true : 'btn btn-warning active',false : 'btn btn-default'}[filter.unknown.value]">Unknown</div>
+    <div ng-click="adjustFilter(filter.obtained)" ng-class="{true : 'btn btn-success active',false : 'btn btn-default'}[filter.obtained.value]">Complete</div>
+    <div ng-click="adjustFilter(filter.unwanted)" ng-class="{true : 'btn btn-danger active',false : 'btn btn-default'}[filter.unwanted.value]">Unwanted</div>
   </div>
 </center>
 <ul class="pager">
   <li ng-class="{true:'previous disabled', false:'previous'}[currentPage == 0]"><a href="javascript:;" ng-click="previous(currentPage)">&larr; Previous</a></li>
   <li ng-class="{true:'next disabled', false:'next'}[currentPage == numberOfPages]"><a href="javascript:;" ng-click="next(currentPage)">Next &rarr;</a></li>
 </ul>
-<div ng-repeat="item in items | stateFilter:selectedState |  orderBy:'itemId' | startFrom:currentPage*pageSize | limitTo:pageSize" ng-class="{3 : 'panel panel-success', 2 : 'panel panel-warning', 1 : 'panel panel-primary', 0 : 'panel panel-danger'}[item.state]">
+<div ng-repeat="item in items | stateFilter:selectedState |  orderBy:'itemId' | startFrom:currentPage*pageSize | limitTo:pageSize"
+  ng-class="{3 : 'panel panel-success', 2 : 'panel panel-warning', 1 : 'panel panel-primary', 0 : 'panel panel-danger'}[item.state]">
   <div class="panel-heading">
     <a class="pull-left" href="#"> <img class="media-object" height="24" width="24" hspace="5" src="{{item.image}}" alt="" />
-    </a> {{item.name}}
-
-    <span class="glyphicon glyphicon-thumbs-up" ng-show="item.state == filter.unobtained.key"></span>
-    <span class="glyphicon glyphicon-thumbs-down" ng-show="item.state == filter.unwanted.key"></span>
-    <span class="glyphicon glyphicon-ok" ng-show="item.state == filter.obtained.key"></span>
-    <span class="glyphicon glyphicon-question-sign" ng-show="item.state == filter.unknown.key"></span>
+    </a> {{item.name}} <span class="glyphicon glyphicon-thumbs-up" ng-show="item.state == filter.unobtained.key"></span> <span
+      class="glyphicon glyphicon-thumbs-down" ng-show="item.state == filter.unwanted.key"></span> <span class="glyphicon glyphicon-ok"
+      ng-show="item.state == filter.obtained.key"></span> <span class="glyphicon glyphicon-question-sign" ng-show="item.state == filter.unknown.key"></span>
     <div class="btn-group btn-group-xs pull-right" ng-show="steamId == mySteamId">
 
-    <div class="btn-group btn-group-xs" >
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <!--  <div class="btn-group btn-group-xs"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
               Mark as... <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="javascript:;" ng-click="markAs(item.wantedId,filter.unobtained.key)"><span class="glyphicon glyphicon-thumbs-up"></span> Wanted</a></li>
+              <li><a href="javascript:;" ng-click="markAs(item.wantedId,filter.unobtained.key)"></span> Wanted</a></li>
               <li><a href="javascript:;" ng-click="markAs(item.wantedId,filter.unwanted.key)"><span class="glyphicon glyphicon-thumbs-down"></span> Unwanted</a></li>
               <li><a href="javascript:;" ng-click="markAs(item.wantedId,filter.obtained.key)"><span class="glyphicon glyphicon-ok"></span> Complete</a></li>
               <li><a href="javascript:;" ng-click="markAs(item.wantedId,filter.unknown.key)"><span class="glyphicon glyphicon-question-sign"></span> Unknown</a></li>
             </ul>
-          </div>
-
-      <button ng-click="showAddDetail(item.wantedId)"  type="button" class="btn btn-xs btn-default" data-toggle="modal"
-        data-target="#myModal">
-        <span class="glyphicon glyphicon-plus"></span> Add Detail
-      </button>
+          </div>-->
+        <button ng-click="markAs(item.wantedId,filter.unobtained.key)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-up"></span></button>
+        <button ng-click="markAs(item.wantedId,filter.unwanted.key)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span></button>
+        <button ng-click="markAs(item.wantedId,filter.obtained.key)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span></button>
+        <button ng-click="markAs(item.wantedId,filter.unknown.key)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-question-sign"></span></button>
+        <button ng-click="showAddDetail(item.wantedId)" type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal">
+          <span class="glyphicon glyphicon-plus"></span> Add Detail
+        </button>
+     <!--  </div> -->
     </div>
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Quality</th>
+          <th>Level</th>
+          <th>Tradable</th>
+          <th>Craftable</th>
+          <th>Craft</th>
+          <th>Giftwrapped</th>
+          <th>Price Range</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="detail in item.details">
+          <td>
+            <div class="btn-group btn-group-xs" ng-show="steamId == mySteamId">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                Action <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="javascript:;" ng-click="edit(detail.detailId)"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
+                <li><a href="javascript:;" ng-click="markAsObtained(detail.detailId)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a></li>
+                <li class="divider"></li>
+                <li ng-click="showDeleteDetail(detail.detailId)" data-toggle="modal" data-target="#delete"><a href="javascript:;"><span
+                    class="glyphicon glyphicon-remove"></span> Delete</a></li>
+              </ul>
+            </div>
+          </td>
+          <td>{{qualityIdToString(detail.quality)}}</td>
+          <td>{{detail.levelNumber}}</td>
+          <td>{{tradableToString(detail.isTradable)}}</td>
+          <td>{{craftableToString(detail.isCraftable)}}</td>
+          <td>{{craftNumberToString(detail.craftNumber)}}</td>
+          <td>{{giftwrapToString(detail.isGiftWrapped)}}</td>
+          <td>{{detail.price}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <table class="table table-condensed">
-    <thead>
-      <tr>
-        <th></th>
-        <th>Quality</th>
-        <th>Level</th>
-        <th>Tradable</th>
-        <th>Craftable</th>
-        <th>Craft</th>
-        <th>Giftwrapped</th>
-        <th>Price Range</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr ng-repeat="detail in item.details">
-        <td>
-          <div class="btn-group btn-group-xs" ng-show="steamId == mySteamId">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-              Action <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-              <li><a href="javascript:;" ng-click="edit(detail.detailId)"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
-              <li><a href="javascript:;" ng-click="markAsObtained(detail.detailId)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a></li>
-              <li class="divider"></li>
-              <li ng-click="showDeleteDetail(detail.detailId)" data-toggle="modal" data-target="#delete"><a
-                href="javascript:;"><span class="glyphicon glyphicon-remove"></span> Delete</a></li>
-            </ul>
-          </div>
-        </td>
-        <td>{{qualityIdToString(detail.quality)}}</td>
-        <td>{{detail.levelNumber}}</td>
-        <td>{{tradableToString(detail.isTradable)}}</td>
-        <td>{{craftableToString(detail.isCraftable)}}</td>
-        <td>{{craftNumberToString(detail.craftNumber)}}</td>
-        <td>{{giftwrapToString(detail.isGiftWrapped)}}</td>
-        <td>{{detail.price}}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<div wanted-dialog proposed-detail="proposedDetail" push-detail-function="pushDetailToModel(wantedId, details)"></div>
-<div wanted-delete proposed-detail-delete="proposedDetailDelete" remove-detail-function="removeDetailFromModel(detailId)"></div>
+  <div wanted-dialog proposed-detail="proposedDetail" push-detail-function="pushDetailToModel(wantedId, details)"></div>
+  <div wanted-delete proposed-detail-delete="proposedDetailDelete" remove-detail-function="removeDetailFromModel(detailId)"></div>
