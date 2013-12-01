@@ -26,15 +26,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Global extends GlobalSettings {
   private static String schemaUrl;
   private static String schemaKey;
-
+  private static String language;
+  private static int schemaNameMaxLength;
   @Override
-  public void beforeStart(Application arg0) {
+  public void beforeStart(Application app) {
     // Initialise configuration
-    super.beforeStart(arg0);
+    super.beforeStart(app);
 
     schemaUrl = Play.application().configuration().getString("schemaUrl");
     schemaKey = Play.application().configuration().getString("apiKey");
+    language = Play.application().configuration().getString("language");
+    schemaNameMaxLength = Integer.parseInt(Play.application().configuration().getString("schemaNameMaxLength"));
   }
+
   @Override
   public void onStart(Application app) {
     Logger.info("Scheduling schema watcher");
@@ -45,7 +49,9 @@ public class Global extends GlobalSettings {
       private JdbcTemplate jdbcTemplate = new JdbcTemplate(DB.getDataSource());
 
       public void run() {
-        WS.url(schemaUrl).setQueryParameter("key", schemaKey).get().map(new Function<WS.Response, Result>() {
+        WS.url(schemaUrl).setQueryParameter("key", schemaKey).setQueryParameter("language", language).get().map(new Function<WS.Response, Result>() {
+
+
           public Result apply(WS.Response response) {
             try {
 
@@ -63,9 +69,12 @@ public class Global extends GlobalSettings {
               if (schemaItems.size() > 0) {
                 Logger.info("Schema change detected");
                 {// TODO:begin transaction
+                  StringBuilder sb = new StringBuilder();
                   for (Items item : schemaItems) {
                     addItemToSchema(item);
+                    sb.append(item.getItem_name()).append(", ").append(item.getDefindex()).append("\n");
                   }
+                  Logger.info("Items added:\n{}", sb.toString());
                 }
                 // finally update the schemaId
                 updateSchemaVersionNumber();
@@ -91,9 +100,11 @@ public class Global extends GlobalSettings {
           }
 
           private void addItemToSchema(Items item) {
-            Object[] params = new Object[] { item.getDefindex(), item.getName(), item.getImage_url() };
-            jdbcTemplate.update("CALL `wanted`.`addSchemaItem`(?, ?, ?)", params);
-            Logger.info("Item added {} ({})", item.getName(), item.getDefindex());
+              item.setItem_name(item.getItem_name().replaceAll("[\u0000-\u001f]", ""));
+              item.setItem_name(item.getItem_name().substring(0, Math.min(item.getItem_name().length(),schemaNameMaxLength)));
+              Object[] params = new Object[] { item.getDefindex(), item.getItem_name(), item.getImage_url() };
+              jdbcTemplate.update("CALL `wanted`.`addSchemaItem`(?, ?, ?)", params);
+
           }
 
           private List<Items> getKnownItems() {

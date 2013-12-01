@@ -10,8 +10,9 @@
   <div class="collapse navbar-collapse navbar-ex1-collapse">
     <ul class="nav navbar-nav">
       <li ng-class="{true:'active', false:''}[locationPath == '/']"><a href="/">Home</a></li>
-      <li ng-class="{true:'active', false:''}[mySteamId === routeParams.id]"    ><a ng-show="loggedIn" href="/id/{{mySteamId}}">Most Wanted</a></li>
-      <li ng-class="{true:'active', false:''}[locationPath == '/about']" ><a href="/about">About</a></li>
+      <li ng-class="{true:'active', false:''}[mySteamId === routeParams.id]"><a ng-show="loggedIn" href="/id/{{mySteamId}}">Most Wanted</a></li>
+      <li ng-class="{true:'active', false:''}[locationPath == '/sync']"><a ng-show="loggedIn" href="/sync">Sync</a></li>
+      <li ng-class="{true:'active', false:''}[locationPath == '/about']"><a href="/about">About</a></li>
     </ul>
     <form class="navbar-form navbar-left" role="search">
       <div class="form-group">

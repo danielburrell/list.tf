@@ -17,6 +17,7 @@ config(['$routeProvider','$locationProvider', function($routeProvider, $location
   $routeProvider.when('/login', {templateUrl: '/assets/partials/login.html', controller: 'LoginCtrl'});
   $routeProvider.when('/logout', {templateUrl: '/assets/partials/logout.html', controller: 'LogoutCtrl'});
   $routeProvider.when('/about', {templateUrl: '/assets/partials/about.html', controller: 'AboutCtrl'});
+  $routeProvider.when('/sync', {templateUrl: '/assets/partials/sync.html', controller: 'SyncCtrl'});
   //$routeProvider.when('/openIDCallback', {templateUrl: '/assets/partials/partial2.html', controller: 'MyCtrl3'});
   $routeProvider.otherwise({redirectTo: '/'});
 }]);
