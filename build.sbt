@@ -23,3 +23,7 @@ mappings in Universal += {
 mappings in Universal += {
   file("reference/historic.json") -> "reference/historic.json"
 }
+
+mappings in Universal += {
+  file("schema/patch/grant_permissions.sql") -> "schema/patch/grant_permissions.sql"
+}
