@@ -103,47 +103,58 @@ app.directive('wantedItem', function() {
 
       $scope.qualities = [ {
         "id" : "0",
-        "name" : "Normal",
+        "name" : "Stock",
+        "shortName" : "Sk",
         "css" : "normal",
       }, {
         "id" : "1",
         "name" : "Genuine",
+        "shortName" : "Gen",
         "css" : "genuine",
       }, {
         "id" : "3",
         "name" : "Vintage",
+        "shortName" : "Vin",
         "css" : "vintage",
       }, {
         "id" : "5",
         "name" : "Unusual",
+        "shortName" : "Unu",
         "css" : "unusual",
       }, {
         "id" : "6",
         "name" : "Unique",
+        "shortName" : "Uni",
         "css" : "unique",
       }, {
         "id" : "7",
         "name" : "Community",
+        "shortName" : "Com",
         "css" : "community",
       }, {
         "id" : "8",
         "name" : "Valve",
+        "shortName" : "Val",
         "css" : "valve",
       }, {
         "id" : "9",
         "name" : "Self-Made",
+        "shortName" : "Sel",
         "css" : "selfmade",
       }, {
         "id" : "11",
         "name" : "Strange",
+        "shortName" : "Str",
         "css" : "strange",
       }, {
         "id" : "13",
         "name" : "Haunted",
+        "shortName" : "Hau",
         "css" : "haunted",
       }, {
         "id" : "-1",
         "name" : "Any Quality",
+        "shortName" : "Any",
         "css" : "default",
       } ];
 
@@ -300,6 +311,16 @@ app.directive('wantedItem', function() {
           }
         }
       };
+
+      $scope.qualityIdToShortString = function(inputId) {
+        for ( var i = 0; i < ($scope.qualities).length; i++) {
+          if ($scope.qualities[i].id == inputId) {
+            return $scope.qualities[i].shortName;
+          }
+        }
+      };
+
+
 
       $scope.currentPage = 0;
       $scope.pageSize = 10;
