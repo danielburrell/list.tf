@@ -504,21 +504,21 @@ public class Application extends Controller {
     SteamUser s = new SteamUser();
     s.steamId = steamId;
     s.item = new LinkedList<Item>();
-    Long currentWantedId = null;
-    Item currentItem = null;
+    Map<Long, Item> normalisationmap = new HashMap<Long, Item>();
     for (Map<String, Object> row : results) {
       Long wantedId = (Long) row.get("wanted_id");
-      if (wantedId != currentWantedId) {
-        Item item = new Item();
-        item.wantedId = wantedId;
-        item.itemId = (Long) row.get("item_id");
-        item.name = (String) row.get("item_name");
-        item.image = (String) row.get("item_image");
-        item.state = (Integer) row.get("state");
-        item.details = new LinkedList<Detail>();
-        currentWantedId = wantedId;
-        s.item.add(item);
-        currentItem = item;
+      Item existingWanted = normalisationmap.get(wantedId);
+
+      if (existingWanted == null) {
+        Item newWantedItem = new Item();
+        newWantedItem.wantedId = wantedId;
+        newWantedItem.itemId = (Long) row.get("item_id");
+        newWantedItem.name = (String) row.get("item_name");
+        newWantedItem.image = (String) row.get("item_image");
+        newWantedItem.state = (Integer) row.get("state");
+        newWantedItem.details = new LinkedList<Detail>();
+        normalisationmap.put(wantedId, newWantedItem);
+        s.item.add(newWantedItem);
       }
 
       Object detailId = row.get("detail_id");
@@ -533,7 +533,7 @@ public class Application extends Controller {
         detail.levelNumber = (Integer) row.get("level_number");
         detail.price = Objects.toString(row.get("price"));
         detail.quality = (Integer) row.get("quality");
-        currentItem.details.add(detail);
+        normalisationmap.get(wantedId).details.add(detail);
       }
 
     }
