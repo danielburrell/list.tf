@@ -60,15 +60,25 @@
   </div>
   <table class="table table-condensed">
     <thead>
-      <tr>
+      <tr class="hidden-xs">
+        <th></th>
+        <th>Quality</th>
+        <th>Level</th>
+        <th>Tradable</th>
+        <th>Craftable</th>
+        <th>Craft Number</th>
+        <th>Giftwrapped</th>
+        <th>Price</th>
+      </tr>
+      <tr class="visible-xs">
         <th></th>
         <th><span class="label label-primary">&nbsp;</span><span class="label label-success">&nbsp;</span><span class="label label-warning">&nbsp;</span></th>
-        <th style="font-family: item_icons">&#57477;</th>
-        <th style="font-family: item_icons">&#58456;</th>
-        <th style="font-family: item_icons">&#58465;</th>
-        <th style="font-family: item_icons">&#58465;#</th>
-        <th style="font-family: item_icons">&#57456;</th>
-        <th style="font-family: item_icons">&#57896;</th>
+        <th><span style="font-family: item_icons">&#57477;</span></th>
+        <th><span style="font-family: item_icons">&#58456;</span></th>
+        <th><span style="font-family: item_icons">&#58465;</span></th>
+        <th><span style="font-family: item_icons">&#58465;</span>#</th>
+        <th><span style="font-family: item_icons">&#57456;</span></th>
+        <th><span style="font-family: item_icons">&#57896;</span></th>
       </tr>
     </thead>
     <tr ng-repeat="detail in item.details">
