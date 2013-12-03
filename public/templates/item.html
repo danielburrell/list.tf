@@ -13,9 +13,9 @@
 </ul>
 <div ng-repeat="item in items | stateFilter:selectedState |  orderBy:'itemId' | startFrom:currentPage*pageSize | limitTo:pageSize"
   ng-class="{3 : 'panel panel-success', 2 : 'panel panel-warning', 1 : 'panel panel-primary', 0 : 'panel panel-danger'}[item.state]">
-  <div class="panel-heading">
-    <a class="pull-left" href="#"> <img class="media-object" height="24" width="24" hspace="5" src="{{item.image}}" alt="" />
-    </a> {{item.name}} <span class="glyphicon glyphicon-thumbs-up" ng-show="item.state == filter.unobtained.key"></span> <span
+  <div class="panel-heading"><a class="pull-left" href="#"> <img style="position:relative; top:-10px; left:-15px;" class="img-thumbnail media-object" height="64" width="64"  src="{{item.image}}" alt="" />
+    </a>
+     <span class="badge">{{item.itemId}}</span>&nbsp;{{item.name}} <span class="glyphicon glyphicon-thumbs-up" ng-show="item.state == filter.unobtained.key"></span> <span
       class="glyphicon glyphicon-thumbs-down" ng-show="item.state == filter.unwanted.key"></span> <span class="glyphicon glyphicon-ok"
       ng-show="item.state == filter.obtained.key"></span> <span class="glyphicon glyphicon-question-sign" ng-show="item.state == filter.unknown.key"></span>
     <div class="btn-group btn-group-xs pull-right" ng-show="steamId == mySteamId">
@@ -35,10 +35,11 @@
         <button ng-click="markAs(item.wantedId,filter.obtained.key)" type="button" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button>
         <button ng-click="markAs(item.wantedId,filter.unknown.key)" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-question-sign"></span></button>
         <button ng-click="showAddDetail(item.wantedId)" type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal">
-          <span class="glyphicon glyphicon-plus"></span> Add Detail
+          <span class="visible-xs glyphicon glyphicon-plus"></span> <span class="hidden-xs">Add Detail</span>
         </button>
      </div>
     </div>
+
     <table class="table table-condensed">
       <thead>
         <tr>
