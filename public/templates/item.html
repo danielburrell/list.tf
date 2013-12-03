@@ -1,24 +1,34 @@
-<center>
-  <div class="btn-group">
+
+
+
+<form class="form-horizontal" role="form">
+<div class="form-group">
+<div class="col-sm-12">
+<div class="input-group">
+                <div class="input-group-btn">
     <div ng-click="adjustFilter(filter.unobtained)" ng-class="{true : 'btn btn-primary active',false : 'btn btn-default'}[filter.unobtained.value]">
-      <span class="hidden-xs">Wanted</span><span class="glyphicon glyphicon-thumbs-up"></span>
+      <span class="hidden-xs">Wanted</span><span class="visible-xs glyphicon glyphicon-thumbs-up"></span>
     </div>
     <div ng-click="adjustFilter(filter.unknown)" ng-class="{true : 'btn btn-warning active',false : 'btn btn-default'}[filter.unknown.value]">
-      <span class="hidden-xs">Unknown</span><span class="glyphicon glyphicon-question-sign"></span>
+      <span class="hidden-xs">Unknown</span><span class="visible-xs glyphicon glyphicon-question-sign"></span>
     </div>
     <div ng-click="adjustFilter(filter.obtained)" ng-class="{true : 'btn btn-success active',false : 'btn btn-default'}[filter.obtained.value]">
-      <span class="hidden-xs">Complete Set</span><span class="glyphicon glyphicon-ok"></span>
+      <span class="hidden-xs">Complete Set</span><span class="visible-xs glyphicon glyphicon-ok"></span>
     </div>
     <div ng-click="adjustFilter(filter.unwanted)" ng-class="{true : 'btn btn-danger active',false : 'btn btn-default'}[filter.unwanted.value]">
-      <span class="hidden-xs">Unwanted</span><span class="glyphicon glyphicon-thumbs-down"></span>
+      <span class="hidden-xs">Unwanted</span><span class="visible-xs glyphicon glyphicon-thumbs-down"></span>
     </div>
-  </div>
-</center>
+    </div>
+    <input type="text" class="form-control" ng-model="search.name" placeholder="Item">
+</div>
+</div>
+          </div>
+
 <ul class="pager">
   <li ng-class="{true:'previous disabled', false:'previous'}[currentPage == 0]"><a href="javascript:;" ng-click="previous(currentPage)">&larr; Previous</a></li>
   <li ng-class="{true:'next disabled', false:'next'}[currentPage == numberOfPages]"><a href="javascript:;" ng-click="next(currentPage)">Next &rarr;</a></li>
 </ul>
-<div ng-repeat="item in items | stateFilter:selectedState |  orderBy:'itemId' | startFrom:currentPage*pageSize | limitTo:pageSize"
+<div ng-repeat="item in items | stateFilter:selectedState | filter:search |  orderBy:'itemId' | startFrom:currentPage*pageSize | limitTo:pageSize"
   ng-class="{3 : 'panel panel-success', 2 : 'panel panel-warning', 1 : 'panel panel-primary', 0 : 'panel panel-danger'}[item.state]">
   <div class="panel-heading">
     <img class="pull-left img-thumbnail media-object" style="position: relative; top: -10px; left: -15px;" height="64" width="64" src="{{item.image}}" alt="" />
@@ -102,7 +112,7 @@
       <td><span class="visible-xs" ng-class="craftNumberToClass(detail.craftNumber)"></span><span
         ng-class="{true:'hidden-xs', false:''}[tooBigToFit(craftNumberToString(detail.craftNumber))]">{{craftNumberToString(detail.craftNumber)}}</span></td>
       <td><span class="visible-xs" ng-class="giftwrapToClass(detail.isGiftWrapped)"></span><span class="hidden-xs">{{giftwrapToString(detail.isGiftWrapped)}}</span></td>
-      <td>{{detail.price}}</td>
+      <td>{{priceToString(detail.price)}}</td>
     </tr>
     </tbody>
   </table>
