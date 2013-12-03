@@ -11,7 +11,6 @@ app.directive('wantedItem', function() {
       $scope.addDetail = function() {
         url = '/api/addDetail/' + $scope.proposedDetail.wantedId;
         $http.post(url, $scope.proposedDetail).success(function(data) {
-          console.log(data);
         }).error(function(data, status, headers, config) {
           // TODO: Error
           // handling for add
@@ -150,13 +149,16 @@ app.directive('wantedItem', function() {
 
       $scope.tradable = [ {
         "id" : "0",
-        "name" : "Untradable"
+        "name" : "Untradable",
+        "clazz" : "glyphicon glyphicon-remove"
       }, {
         "id" : "1",
-        "name" : "Tradable"
+        "name" : "Tradable",
+        "clazz" : "glyphicon glyphicon-ok-sign"
       }, {
         "id" : "2",
-        "name" : "Don't care"
+        "name" : "Don't care",
+        "clazz" : "glyphicon glyphicon-question-sign"
       } ];
 
       $scope.tradableToString = function(tradable) {
@@ -167,12 +169,17 @@ app.directive('wantedItem', function() {
         }
       };
 
+      $scope.tradableToClass = function(tradable) {
+        for ( var i = 0; i < ($scope.tradable).length; i++) {
+          if ($scope.tradable[i].id == tradable) {
+            return $scope.tradable[i].clazz;
+          }
+        }
+      };
+
       $scope.markAs = function(wantedId, state) {
         url = '/api/markAs/' + wantedId + '/' + state;
         $http.post(url).success(function(data) {
-          console.log(data);
-          console.log(wantedId);
-          console.log(state);
           $scope.pushStateChangeToModel(wantedId, state);
         }).error(function(data, status, headers, config) {
           // TODO: Error
@@ -182,13 +189,16 @@ app.directive('wantedItem', function() {
       }
       $scope.craftable = [ {
         "id" : "0",
-        "name" : "Uncraftable"
+        "name" : "Uncraftable",
+        "clazz" : "glyphicon glyphicon-remove"
       }, {
         "id" : "1",
-        "name" : "Craftable"
+        "name" : "Craftable",
+        "clazz" : "glyphicon glyphicon-ok-sign"
       }, {
         "id" : "2",
-        "name" : "Don't care"
+        "name" : "Don't care",
+        "clazz" : "glyphicon glyphicon-question-sign"
       } ];
 
       $scope.craftableToString = function(craftable) {
@@ -199,15 +209,26 @@ app.directive('wantedItem', function() {
         }
       };
 
+      $scope.craftableToClass = function(craftable) {
+        for ( var i = 0; i < ($scope.craftable).length; i++) {
+          if ($scope.craftable[i].id == craftable) {
+            return $scope.craftable[i].clazz;
+          }
+        }
+      };
+
       $scope.giftwrapped = [ {
         "id" : "0",
-        "name" : "Not Wrapped"
+        "name" : "Not Wrapped",
+        "clazz" : "glyphicon glyphicon-remove"
       }, {
         "id" : "1",
-        "name" : "Wrapped"
+        "name" : "Wrapped",
+        "clazz" : "glyphicon glyphicon-ok-sign"
       }, {
         "id" : "2",
-        "name" : "Don't care"
+        "name" : "Don't care",
+        "clazz" : "glyphicon glyphicon-question-sign"
       } ];
 
       $scope.giftwrapToString = function(giftwrapped) {
@@ -218,13 +239,56 @@ app.directive('wantedItem', function() {
         }
       };
 
+      $scope.giftwrapToClass = function(giftwrapped) {
+        for ( var i = 0; i < ($scope.giftwrapped).length; i++) {
+          if ($scope.giftwrapped[i].id == giftwrapped) {
+            return $scope.giftwrapped[i].clazz;
+          }
+        }
+      };
+
+
+
       $scope.craftNumberToString = function(craftNumber) {
         if (craftNumber == -1) {
-          return "Any";
+          return "Don't Care";
         } else if (craftNumber == 0) {
           return "Without CraftNumber";
         } else {
-          return "Specific CraftNumber";
+          return "#"+craftNumber;
+        }
+        ;
+      }
+
+      $scope.tooBigToFit = function(text) {
+        return text.length > 8;
+        console.log(text.length);
+      }
+      $scope.levelToString = function(levelNumber) {
+        if (levelNumber == 0) {
+          return "Any";
+        } else {
+          return levelNumber;
+        }
+        ;
+      }
+
+      $scope.levelToClass = function(levelNumber) {
+        if (levelNumber == 0) {
+          return "glyphicon glyphicon-question-sign";
+        } else {
+          return levelNumber;
+        }
+        ;
+      }
+
+      $scope.craftNumberToClass = function(craftNumber) {
+        if (craftNumber == -1) {
+          return "glyphicon glyphicon-question-sign";
+        } else if (craftNumber == 0) {
+          return "glyphicon glyphicon-remove";
+        } else {
+          return "#"+craftNumber;
         }
         ;
       }
@@ -262,7 +326,6 @@ app.directive('wantedItem', function() {
       $scope.getWanted = function(steamId) {
 
         url = '/api/getWantedList/' + steamId;
-        console.log(url);
         $http.get(url).success(function(data) {
           $scope.items = data.item;
         });

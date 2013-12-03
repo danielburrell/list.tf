@@ -1,10 +1,10 @@
 <center>
   <div class="btn-group">
     <div ng-click="adjustFilter(filter.unobtained)" ng-class="{true : 'btn btn-primary active',false : 'btn btn-default'}[filter.unobtained.value]">
-      Wanted</div>
-    <div ng-click="adjustFilter(filter.unknown)" ng-class="{true : 'btn btn-warning active',false : 'btn btn-default'}[filter.unknown.value]">Unknown</div>
-    <div ng-click="adjustFilter(filter.obtained)" ng-class="{true : 'btn btn-success active',false : 'btn btn-default'}[filter.obtained.value]">Complete</div>
-    <div ng-click="adjustFilter(filter.unwanted)" ng-class="{true : 'btn btn-danger active',false : 'btn btn-default'}[filter.unwanted.value]">Unwanted</div>
+      <span class="hidden-xs">Wanted</span><span class="glyphicon glyphicon-thumbs-up"></span></div>
+    <div ng-click="adjustFilter(filter.unknown)" ng-class="{true : 'btn btn-warning active',false : 'btn btn-default'}[filter.unknown.value]"> <span class="hidden-xs">Unknown</span><span class="glyphicon glyphicon-question-sign"></span></div>
+    <div ng-click="adjustFilter(filter.obtained)" ng-class="{true : 'btn btn-success active',false : 'btn btn-default'}[filter.obtained.value]"> <span class="hidden-xs">Complete Set</span><span class="glyphicon glyphicon-ok"></span></div>
+    <div ng-click="adjustFilter(filter.unwanted)" ng-class="{true : 'btn btn-danger active',false : 'btn btn-default'}[filter.unwanted.value]"> <span class="hidden-xs">Unwanted</span><span class="glyphicon glyphicon-thumbs-down"></span></div>
   </div>
 </center>
 <ul class="pager">
@@ -30,10 +30,10 @@
               <li><a href="javascript:;" ng-click="markAs(item.wantedId,filter.unknown.key)"><span class="glyphicon glyphicon-question-sign"></span> Unknown</a></li>
             </ul>
           </div>-->
-        <button ng-click="markAs(item.wantedId,filter.unobtained.key)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-up"></span></button>
-        <button ng-click="markAs(item.wantedId,filter.unwanted.key)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-thumbs-down"></span></button>
-        <button ng-click="markAs(item.wantedId,filter.obtained.key)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok"></span></button>
-        <button ng-click="markAs(item.wantedId,filter.unknown.key)" type="button" class="btn btn-default"><span class="glyphicon glyphicon-question-sign"></span></button>
+        <button ng-click="markAs(item.wantedId,filter.unobtained.key)" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span></button>
+        <button ng-click="markAs(item.wantedId,filter.unwanted.key)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-thumbs-down"></span></button>
+        <button ng-click="markAs(item.wantedId,filter.obtained.key)" type="button" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+        <button ng-click="markAs(item.wantedId,filter.unknown.key)" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-question-sign"></span></button>
         <button ng-click="showAddDetail(item.wantedId)" type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal">
           <span class="glyphicon glyphicon-plus"></span> Add Detail
         </button>
@@ -45,14 +45,13 @@
           <th></th>
           <th>Quality</th>
           <th>Level</th>
-          <th>Tradable</th>
-          <th><span class="glyphicons blacksmith"></span></th>
-          <th>#</th>
-          <th>Giftwrapped</th>
-          <th>Price Range</th>
+          <th style="font-family: item_icons">&#57474;</th>
+          <th style="font-family: item_icons">&#58465;</th>
+          <th style="font-family: item_icons">&#58465;#</th>
+          <th style="font-family: item_icons">&#57456;</th>
+          <th style="font-family: item_icons">&#57896;</th>
         </tr>
       </thead>
-      c
         <tr ng-repeat="detail in item.details">
           <td>
             <div class="btn-group btn-group-xs" ng-show="steamId == mySteamId">
@@ -69,11 +68,11 @@
             </div>
           </td>
           <td>{{qualityIdToString(detail.quality)}}</td>
-          <td>{{detail.levelNumber}}</td>
-          <td>{{tradableToString(detail.isTradable)}}</td>
-          <td>{{craftableToString(detail.isCraftable)}}</td>
-          <td>{{craftNumberToString(detail.craftNumber)}}</td>
-          <td>{{giftwrapToString(detail.isGiftWrapped)}}</td>
+          <td><span>{{levelToString(detail.levelNumber)}}</span></td>
+          <td><span class="visible-xs" ng-class="tradableToClass(detail.isTradable)"></span><span class="hidden-xs">{{tradableToString(detail.isTradable)}}</span></td>
+          <td><span class="visible-xs" ng-class="craftableToClass(detail.isCraftable)"></span><span class="hidden-xs">{{craftableToString(detail.isCraftable)}}</span></td>
+          <td><span class="visible-xs" ng-class="craftNumberToClass(detail.craftNumber)"></span><span ng-class="{true:'hidden-xs', false:''}[tooBigToFit(craftNumberToString(detail.craftNumber))]">{{craftNumberToString(detail.craftNumber)}}</span></td>
+          <td><span class="visible-xs" ng-class="giftwrapToClass(detail.isGiftWrapped)"></span><span class="hidden-xs">{{giftwrapToString(detail.isGiftWrapped)}}</span></td>
           <td>{{detail.price}}</td>
         </tr>
       </tbody>

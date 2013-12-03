@@ -1,8 +1,14 @@
 <div>
-  <div wanted-nav logged-in="loggedIn" my-steam-id="mySteamId" ></div>
+  <div wanted-nav logged-in="loggedIn" my-steam-id="mySteamId"></div>
   <div class="well">
-    <h1><img src="{{avatar}}" alt="..." class="img-thumbnail"/>&nbsp;{{name}}'s most wanted.</h1>
-    <div class="alert alert-danger">Custom warning message here.</div>
+    <div class="row-fluid">
+      <div class="span 12">
+        <h3>
+          <img src="{{avatar}}" alt="..." class="img-thumbnail" />&nbsp;{{name}}
+        </h3>
+        <p class="alert alert-danger">Custom warning message here.</p>
+      </div>
+    </div>
   </div>
   <div class="well">
     <div wanted-item steam-id="id" my-steam-id="mySteamId"></div>
