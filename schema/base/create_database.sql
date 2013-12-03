@@ -154,8 +154,8 @@ insert into `wanted`.`item` (steam_user_steam_id, item_id, state)
 select steam_id, s.item_id, 2
 from item_schema s
 where s.item_id not in (
-    select item_id 
-    from item 
+    select item_id
+    from item
     where item.steam_user_steam_id = steam_id);
 SELECT ROW_COUNT() into affected_rows;
 END$$
@@ -190,17 +190,17 @@ DROP procedure IF EXISTS `wanted`.`getWantedList`;
 
 DELIMITER $$
 USE `wanted`$$
-CREATE PROCEDURE `getWantedList` (steam_id bigint)
+CREATE PROCEDURE `getWantedList` (in steam_id bigint)
 SQL SECURITY INVOKER
 BEGIN
-	select 
+  select
     su.steam_id,
     su.schema_id,
     i.wanted_id,
     i.state,
     i.item_id,
-	s.item_name,
-	s.item_image,
+  s.item_name,
+  s.item_image,
     d.detail_id,
     d.quality,
     d.level_number,
@@ -212,12 +212,12 @@ BEGIN
     d.priority,
     d.price
 from
-    steam_user as su 
-	left join item as i on su.steam_id = i.steam_user_steam_id and su.steam_id = steam_id
+    steam_user as su
+  left join item as i on su.steam_id = i.steam_user_steam_id
     left join detail as d on i.wanted_id = d.item_wanted_id
-	left join item_schema as s on i.item_id = s.item_id;
-    
-    
+  left join item_schema as s on i.item_id = s.item_id
+    where su.steam_id = steam_id;
+
 END$$
 
 DELIMITER ;
@@ -234,7 +234,7 @@ USE `wanted`$$
 CREATE PROCEDURE `addSchemaItem` (item_id bigint, item_name varchar(100), item_image varchar(150))
 SQL SECURITY INVOKER
 BEGIN
-	INSERT INTO `wanted`.`item_schema` (`item_id`, `item_name`, `item_image`) VALUES (item_id, item_name, item_image);
+  INSERT INTO `wanted`.`item_schema` (`item_id`, `item_name`, `item_image`) VALUES (item_id, item_name, item_image);
 END$$
 
 DELIMITER ;
@@ -268,7 +268,7 @@ USE `wanted`$$
 CREATE PROCEDURE `getSchema` ()
 SQL SECURITY INVOKER
 BEGIN
-	select item_id, item_name from wanted.item_schema;
+  select item_id, item_name from wanted.item_schema;
 END$$
 
 DELIMITER ;
@@ -285,32 +285,32 @@ USE `wanted`$$
 CREATE PROCEDURE `getWelcomeStatus` (steam_id bigint, out welcome_status int)
 SQL SECURITY INVOKER
 BEGIN
-	declare userExists int;
-	select count(1) into userExists from `wanted`.`steam_user` as su where su.steam_id = steam_id;
+  declare userExists int;
+  select count(1) into userExists from `wanted`.`steam_user` as su where su.steam_id = steam_id;
 -- if user exists then
-	if userExists > 0 then 
-		-- user exists, call update user
-		begin
-			
-			call `wanted`.`updateUserItems`(steam_id, @rows_inserted);
-			if @rows_inserted > 0 then
-				-- new items
-			
-				select 1 into welcome_status;
-			else 
-				-- no new items
-			
-				select 2 into welcome_status;
-			end if;
-		end;
-	else 
-		begin
-			-- new user
+  if userExists > 0 then
+    -- user exists, call update user
+    begin
 
-			call `wanted`.`createNewUser` (steam_id);
-			select 0 into welcome_status;
-		end;
-	end if;
+      call `wanted`.`updateUserItems`(steam_id, @rows_inserted);
+      if @rows_inserted > 0 then
+        -- new items
+
+        select 1 into welcome_status;
+      else
+        -- no new items
+
+        select 2 into welcome_status;
+      end if;
+    end;
+  else
+    begin
+      -- new user
+
+      call `wanted`.`createNewUser` (steam_id);
+      select 0 into welcome_status;
+    end;
+  end if;
 
 END$$
 
@@ -328,8 +328,8 @@ USE `wanted`$$
 CREATE PROCEDURE `deleteDetail` (steam_id bigint, detail_id bigint, out deleted_row_count bigint)
 SQL SECURITY INVOKER
 BEGIN
-	delete detail from detail join item on item.wanted_id = detail.item_wanted_id where item.steam_user_steam_id = steam_id and detail.detail_id = detail_id;
-	select ROW_COUNT() into deleted_row_count;
+  delete detail from detail join item on item.wanted_id = detail.item_wanted_id where item.steam_user_steam_id = steam_id and detail.detail_id = detail_id;
+  select ROW_COUNT() into deleted_row_count;
 END$$
 
 DELIMITER ;
@@ -346,8 +346,8 @@ USE `wanted`$$
 CREATE PROCEDURE `editState` (steam_id bigint, wanted_id bigint, state tinyint, out updated_row_count bigint)
 SQL SECURITY INVOKER
 BEGIN
-	update item i set i.state = state where i.steam_user_steam_id = steam_id and i.wanted_id = wanted_id;
-	select ROW_COUNT() into updated_row_count;
+  update item i set i.state = state where i.steam_user_steam_id = steam_id and i.wanted_id = wanted_id;
+  select ROW_COUNT() into updated_row_count;
 END$$
 
 DELIMITER ;
@@ -364,8 +364,8 @@ USE `wanted`$$
 CREATE PROCEDURE `markDetailAsObtained` (detail_id bigint, out updated_row_count bigint)
 SQL SECURITY INVOKER
 BEGIN
-	update detail set detail.is_obtained = true where detail.detail_id = detail_id;
-	select ROW_COUNT() into updated_row_count;
+  update detail set detail.is_obtained = true where detail.detail_id = detail_id;
+  select ROW_COUNT() into updated_row_count;
 END$$
 
 DELIMITER ;
