@@ -129,3 +129,8 @@
   </div>
   <div wanted-dialog proposed-detail="proposedDetail" push-detail-function="pushDetailToModel(wantedId, details)"></div>
   <div wanted-delete proposed-detail-delete="proposedDetailDelete" remove-detail-function="removeDetailFromModel(detailId)"></div>
+  <ul class="pager">
+    <li ng-class="{true:'previous disabled', false:'previous'}[currentPage == 0]"><a href="javascript:;" ng-click="previous(currentPage)">&larr;
+        Previous</a></li>
+    <li ng-class="{true:'next disabled', false:'next'}[currentPage == numberOfPages]"><a href="javascript:;" ng-click="next(currentPage)">Next &rarr;</a></li>
+  </ul>
