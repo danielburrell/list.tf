@@ -2,3 +2,7 @@
   font-family: item_icons;
   src: url('/assets/fonts/glyphicons-regular.ttf');
 }
+
+td.strike {
+  text-decoration: line-through;
+}
