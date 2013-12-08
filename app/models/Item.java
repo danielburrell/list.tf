@@ -36,4 +36,5 @@ public class Item extends Model {
     @OneToMany(cascade=CascadeType.ALL)
     public List<Detail> details;
 
+    public int effectivePriority;
 }

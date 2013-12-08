@@ -17,7 +17,7 @@
             <span class="hidden-xs">Unwanted</span><span class="visible-xs glyphicon glyphicon-thumbs-down"></span>
           </div>
         </div>
-        <input type="text" class="form-control" ng-model="search.name" placeholder="Item">
+        <input type="text" class="form-control" ng-model="search.name" placeholder="Item" ng-change="currentPage=0">
       </div>
     </div>
   </div>
@@ -26,7 +26,7 @@
         Previous</a></li>
     <li ng-class="{true:'next disabled', false:'next'}[currentPage == numberOfPages]"><a href="javascript:;" ng-click="next(currentPage)">Next &rarr;</a></li>
   </ul>
-  <div ng-repeat="item in items | stateFilter:selectedState | filter:search |  orderBy:'itemId' | startFrom:currentPage*pageSize | limitTo:pageSize"
+  <div ng-repeat="item in items | stateFilter:selectedState | filter:search |  orderBy:'effectivePriority':true | startFrom:currentPage*pageSize | limitTo:pageSize"
     ng-class="{3 : 'panel panel-success', 2 : 'panel panel-warning', 1 : 'panel panel-primary', 0 : 'panel panel-danger'}[item.state]">
     <div class="panel-heading">
       <img class="pull-left img-thumbnail media-object" style="position: relative; top: -10px; left: -15px;" height="64" width="64" src="{{item.image}}" alt="" />
@@ -96,7 +96,7 @@
           <th><span style="font-family: item_icons">&#58372;</span></th>
         </tr>
       </thead>
-      <tr ng-repeat="detail in item.details">
+      <tr ng-repeat="detail in item.details | orderBy:['isObtained','priority']">
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]">
           <div class="btn-group btn-group-xs" ng-show="steamId == mySteamId">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">

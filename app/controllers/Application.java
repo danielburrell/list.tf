@@ -518,6 +518,7 @@ public class Application extends Controller {
         newWantedItem.image = (String) row.get("item_image");
         newWantedItem.state = (Integer) row.get("state");
         newWantedItem.details = new LinkedList<Detail>();
+
         normalisationmap.put(wantedId, newWantedItem);
         s.item.add(newWantedItem);
       }
@@ -541,7 +542,22 @@ public class Application extends Controller {
       }
 
     }
+    //apply priority
+    for (Item item:s.item){
+      item.effectivePriority = maxOfWantedDetails(item.details);
+    }
+
     return s;
+  }
+
+  private static int maxOfWantedDetails(List<Detail> details) {
+    int highest = 0;
+    for (Detail detail: details){
+      if (!detail.isObtained && detail.priority > highest) {
+        highest = detail.priority;
+      }
+    }
+    return highest;
   }
 
   public static Result wantedPartial() {
