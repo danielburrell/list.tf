@@ -135,6 +135,24 @@
                 </ul>
               </div>
             </div>
+            </div>
+            <div class="form-group">
+            <label for="inputPassword3" class="col-sm-3 control-label">Priority</label>
+            <div class="col-sm-9">
+              <!-- Single button -->
+              <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  {{priorityToString(proposedDetail.details.priority)}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="javascript:;" ng-click="proposedDetail.details.priority=0">Low</a></li>
+                  <li><a href="javascript:;" ng-click="proposedDetail.details.priority=1">Medium</a></li>
+                  <li><a href="javascript:;" ng-click="proposedDetail.details.priority=2">High</a></li>
+                  <li><a href="javascript:;" ng-click="proposedDetail.details.priority=3">Critical</a></li>
+                </ul>
+              </div>
+            </div>
+            </div>
         </form>
       </div>
       <div class="modal-footer">

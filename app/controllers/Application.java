@@ -45,6 +45,7 @@ import views.html.index;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class Application extends Controller {
 
@@ -533,6 +534,9 @@ public class Application extends Controller {
         detail.levelNumber = (Integer) row.get("level_number");
         detail.price = Objects.toString(row.get("price"));
         detail.quality = (Integer) row.get("quality");
+        Object priority = row.get("priority");
+        if (priority == null) { priority = new Integer(0); }
+        detail.priority = (Integer) priority;
         normalisationmap.get(wantedId).details.add(detail);
       }
 
@@ -548,7 +552,7 @@ public class Application extends Controller {
   public static Result addDetail(Long wantedId) {
     JsonNode json = request().body().asJson();// (Detail.class);
     Detail detail = Json.fromJson(json, Detail.class);
-    Logger.info("Validating..");
+    Logger.info("Validating..{}",json.asText());
     boolean validDetail = validate(detail);
 
     if (validDetail) {

@@ -113,6 +113,30 @@ app.directive('wantedDialog', function() {
         }
       };
 
+      $scope.priority = [ {
+        "id" : "0",
+        "name" : "Low",
+        "clazz" : "glyphicon glyphicon-arrow-down"
+      }, {
+        "id" : "1",
+        "name" : "Medium",
+        "clazz" : "glyphicon glyphicon-bell"
+      }, {
+        "id" : "2",
+        "name" : "High",
+        "clazz" : "glyphicon glyphicon-arrow-up"
+      }, {
+        "id" : "3",
+        "name" : "Critical",
+        "clazz" : "glyphicon glyphicon-exclamation-sign"
+      } ];
+      $scope.priorityToString = function(priority) {
+        for ( var i = 0; i < ($scope.priority).length; i++) {
+          if ($scope.priority[i].id == priority) {
+            return $scope.priority[i].name;
+          }
+        }
+      }
       $scope.giftwrapped = [ {
         "id" : "0",
         "name" : "Not Wrapped"

@@ -50,6 +50,7 @@
           data-target="#myModal">
           <span class="glyphicon glyphicon-plus"></span> Add Detail
         </button>
+
       </div>
       <div class="btn-group btn-group-xs pull-right visible-xs" ng-show="steamId == mySteamId">
         <button ng-show="steamId == mySteamId" type="button" class="btn btn-default dropdown-toggle pull-right" data-toggle="dropdown">
@@ -80,6 +81,7 @@
           <th>Craft Number</th>
           <th>Giftwrapped</th>
           <th>Price</th>
+          <th>Priority</th>
         </tr>
         <tr class="visible-xs">
           <th></th>
@@ -91,6 +93,7 @@
           <th><span style="font-family: item_icons">&#58465;</span>#</th>
           <th><span style="font-family: item_icons">&#57456;</span></th>
           <th><span style="font-family: item_icons">&#57896;</span></th>
+          <th><span style="font-family: item_icons">&#58372;</span></th>
         </tr>
       </thead>
       <tr ng-repeat="detail in item.details">
@@ -103,8 +106,12 @@
               <li><a href="javascript:;" ng-click="edit(detail.detailId)"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
               <li><a href="javascript:;" ng-click="markAsObtained(detail.detailId)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a></li>
               <li class="divider"></li>
+              <li><a href="javascript:;" ng-click="increasePriority(detail.detailId)"><span class="glyphicon glyphicon-arrow-up"></span> Increase Priority</a></li>
+              <li><a href="javascript:;" ng-click="decreasePriority(detail.detailId)"><span class="glyphicon glyphicon-arrow-down"></span> Decrease Priority</a></li>
+              <li class="divider"></li>
               <li ng-click="showDeleteDetail(detail.detailId)" data-toggle="modal" data-target="#delete"><a href="javascript:;"><span
                   class="glyphicon glyphicon-remove"></span> Delete</a></li>
+
             </ul>
           </div>
         </td>
@@ -122,7 +129,9 @@
           ng-class="{true:'hidden-xs', false:''}[tooBigToFit(craftNumberToString(detail.craftNumber))]">{{craftNumberToString(detail.craftNumber)}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs"
           ng-class="giftwrapToClass(detail.isGiftWrapped)"></span><span class="hidden-xs">{{giftwrapToString(detail.isGiftWrapped)}}</span></td>
-        <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]">{{priceToString(detail.price)}}</td>
+        <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]">{{detail.price}}</td>
+        <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs"
+          ng-class="priorityToClass(detail.priority)"></span><span class="hidden-xs">{{priorityToString(detail.priority)}}</span></td>
       </tr>
       </tbody>
     </table>

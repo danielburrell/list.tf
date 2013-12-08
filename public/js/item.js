@@ -59,7 +59,7 @@ app.directive('wantedItem', function() {
           "isGiftWrapped" : 0,
           "price" : "ASK",
           "isObtained" : 0,
-          "priority" : undefined
+          "priority" : 0
         }
       };
 
@@ -198,6 +198,29 @@ app.directive('wantedItem', function() {
           // detail
         });
       }
+
+      $scope.markAs = function(detailId) {
+        url = '/api/priorityUp/' + detailId;
+        $http.post(url).success(function(data) {
+          $scope.pushIncreaseToModel(detailId);
+        }).error(function(data, status, headers, config) {
+          // TODO: Error
+          // handling for add
+          // detail
+        });
+      }
+
+      $scope.markAs = function(detailId) {
+        url = '/api/priorityDown/' + detailId;
+        $http.post(url).success(function(data) {
+          $scope.pushDecreaseToModel(detailId);
+        }).error(function(data, status, headers, config) {
+          // TODO: Error
+          // handling for add
+          // detail
+        });
+      }
+
       $scope.craftable = [ {
         "id" : "0",
         "name" : "Uncraftable",
@@ -242,6 +265,24 @@ app.directive('wantedItem', function() {
         "clazz" : "glyphicon glyphicon-question-sign"
       } ];
 
+      $scope.priority = [ {
+        "id" : "0",
+        "name" : "Low",
+        "clazz" : "glyphicon glyphicon-arrow-down"
+      }, {
+        "id" : "1",
+        "name" : "Medium",
+        "clazz" : "glyphicon glyphicon-bell"
+      }, {
+        "id" : "2",
+        "name" : "High",
+        "clazz" : "glyphicon glyphicon-arrow-up"
+      }, {
+        "id" : "3",
+        "name" : "Critical",
+        "clazz" : "glyphicon glyphicon-exclamation-sign"
+      } ];
+
       $scope.giftwrapToString = function(giftwrapped) {
         for ( var i = 0; i < ($scope.giftwrapped).length; i++) {
           if ($scope.giftwrapped[i].id == giftwrapped) {
@@ -258,7 +299,24 @@ app.directive('wantedItem', function() {
         }
       };
 
+      $scope.priorityToString = function(priority) {
+        if (priority == undefined) { priority = 0};
+        for ( var i = 0; i < ($scope.priority).length; i++) {
+          if ($scope.priority[i].id == priority) {
+            return $scope.priority[i].name;
+          }
+        }
+      }
 
+      $scope.priorityToClass = function(priority) {
+
+        if (priority == undefined) { priority = 0};
+        for ( var i = 0; i < ($scope.priority).length; i++) {
+          if ($scope.priority[i].id == priority) {
+            return $scope.giftwrapped[i].clazz;
+          }
+        }
+      }
 
       $scope.craftNumberToString = function(craftNumber) {
         if (craftNumber == -1) {
