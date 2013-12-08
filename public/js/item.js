@@ -313,7 +313,7 @@ app.directive('wantedItem', function() {
         if (priority == undefined) { priority = 0};
         for ( var i = 0; i < ($scope.priority).length; i++) {
           if ($scope.priority[i].id == priority) {
-            return $scope.giftwrapped[i].clazz;
+            return $scope.priority[i].clazz;
           }
         }
       }
