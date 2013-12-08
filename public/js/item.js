@@ -74,6 +74,31 @@ app.directive('wantedItem', function() {
         ;
       };
 
+      $scope.pushIncreaseToModel = function(detailId) {
+        for ( var i = 0; i < $scope.items.length; i++) {
+          for ( var j = 0; j < $scope.items[i].details.length; j++) {
+            if ($scope.items[i].details[j].detailId == detailId) {
+              $scope.items[i].details[j].priority++;
+              $scope.items[i].recentlyChanged = 1;
+            }
+          }
+        }
+        ;
+
+      };
+
+      $scope.pushDecreaseToModel = function(detailId) {
+        for ( var i = 0; i < $scope.items.length; i++) {
+          for ( var j = 0; j < $scope.items[i].details.length; j++) {
+            if ($scope.items[i].details[j].detailId == detailId) {
+              $scope.items[i].details[j].priority--;
+              $scope.items[i].recentlyChanged = 1;
+            }
+          }
+        }
+        ;
+      };
+
       $scope.pushStateChangeToModel = function(wantedId, state) {
         for ( var i = 0; i < $scope.items.length; i++) {
           if ($scope.items[i].wantedId == wantedId) {
@@ -83,6 +108,8 @@ app.directive('wantedItem', function() {
         }
         ;
       };
+
+
 
       $scope.pushDetailToModel = function(wantedId, details) {
         for ( var i = 0; i < $scope.items.length; i++) {
@@ -199,7 +226,7 @@ app.directive('wantedItem', function() {
         });
       }
 
-      $scope.markAs = function(detailId) {
+      $scope.increasePriority = function(detailId) {
         url = '/api/priorityUp/' + detailId;
         $http.post(url).success(function(data) {
           $scope.pushIncreaseToModel(detailId);
@@ -210,7 +237,7 @@ app.directive('wantedItem', function() {
         });
       }
 
-      $scope.markAs = function(detailId) {
+      $scope.decreasePriority = function(detailId) {
         url = '/api/priorityDown/' + detailId;
         $http.post(url).success(function(data) {
           $scope.pushDecreaseToModel(detailId);
@@ -220,6 +247,8 @@ app.directive('wantedItem', function() {
           // detail
         });
       }
+
+
 
       $scope.craftable = [ {
         "id" : "0",

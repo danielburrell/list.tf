@@ -641,6 +641,46 @@ public class Application extends Controller {
     }
   }
 
+  public static Result priorityUp(long detailId) {
+    // require index on [detailId & steamId]
+    // delete from wanted.details where detailId = x and steamId = session()
+    long steamId = Long.parseLong(session("steamId"));
+    Object[] params = new Object[] { steamId, detailId };
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DB.getDataSource());
+    SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate).withSchemaName("wanted").withProcedureName("increaseDetailPriority");
+    Logger.info("Executed");
+    Map<String, Object> result = call.execute(params);
+    Logger.info("Results: {}", Json.toJson(result));
+    long rowCount = (long) result.get("updated_row_count");
+    if ((rowCount > 0)) {
+      return ok(Json.newObject().put("rowCount", rowCount));
+    } else {
+      DeleteError error = new DeleteError();
+      error.error = "Delete failed";
+      return badRequest(Json.toJson(error));
+    }
+  }
+
+  public static Result priorityDown(long detailId) {
+    // require index on [detailId & steamId]
+    // delete from wanted.details where detailId = x and steamId = session()
+    long steamId = Long.parseLong(session("steamId"));
+    Object[] params = new Object[] { steamId, detailId };
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DB.getDataSource());
+    SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate).withSchemaName("wanted").withProcedureName("decreaseDetailPriority");
+    Logger.info("Executed");
+    Map<String, Object> result = call.execute(params);
+    Logger.info("Results: {}", Json.toJson(result));
+    long rowCount = (long) result.get("updated_row_count");
+    if ((rowCount > 0)) {
+      return ok(Json.newObject().put("rowCount", rowCount));
+    } else {
+      DeleteError error = new DeleteError();
+      error.error = "Delete failed";
+      return badRequest(Json.toJson(error));
+    }
+  }
+
   public static Result markAs(Long wantedId, Long state) {
     // requires index on [detailId & steamId]
     // update wanted.details () where detailId = x and steamId = session()
