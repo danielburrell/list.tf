@@ -109,8 +109,6 @@ app.directive('wantedItem', function() {
         ;
       };
 
-
-
       $scope.pushDetailToModel = function(wantedId, details) {
         for ( var i = 0; i < $scope.items.length; i++) {
           if ($scope.items[i].wantedId == wantedId) {
@@ -226,29 +224,32 @@ app.directive('wantedItem', function() {
         });
       }
 
-      $scope.increasePriority = function(detailId) {
-        url = '/api/priorityUp/' + detailId;
-        $http.post(url).success(function(data) {
-          $scope.pushIncreaseToModel(detailId);
-        }).error(function(data, status, headers, config) {
-          // TODO: Error
-          // handling for add
-          // detail
-        });
+      $scope.increasePriority = function(detailId, priority) {
+        console.log(priority);
+        if (priority < 3) {
+          url = '/api/priorityUp/' + detailId;
+          $http.post(url).success(function(data) {
+            $scope.pushIncreaseToModel(detailId);
+          }).error(function(data, status, headers, config) {
+            // TODO: Error
+            // handling for add
+            // detail
+          });
+        }
       }
 
-      $scope.decreasePriority = function(detailId) {
-        url = '/api/priorityDown/' + detailId;
-        $http.post(url).success(function(data) {
-          $scope.pushDecreaseToModel(detailId);
-        }).error(function(data, status, headers, config) {
-          // TODO: Error
-          // handling for add
-          // detail
-        });
+      $scope.decreasePriority = function(detailId, priority) {
+        if (priority > 0) {
+          url = '/api/priorityDown/' + detailId;
+          $http.post(url).success(function(data) {
+            $scope.pushDecreaseToModel(detailId);
+          }).error(function(data, status, headers, config) {
+            // TODO: Error
+            // handling for add
+            // detail
+          });
+        }
       }
-
-
 
       $scope.craftable = [ {
         "id" : "0",
@@ -329,7 +330,10 @@ app.directive('wantedItem', function() {
       };
 
       $scope.priorityToString = function(priority) {
-        if (priority == undefined) { priority = 0};
+        if (priority == undefined) {
+          priority = 0
+        }
+        ;
         for ( var i = 0; i < ($scope.priority).length; i++) {
           if ($scope.priority[i].id == priority) {
             return $scope.priority[i].name;
@@ -339,7 +343,10 @@ app.directive('wantedItem', function() {
 
       $scope.priorityToClass = function(priority) {
 
-        if (priority == undefined) { priority = 0};
+        if (priority == undefined) {
+          priority = 0
+        }
+        ;
         for ( var i = 0; i < ($scope.priority).length; i++) {
           if ($scope.priority[i].id == priority) {
             return $scope.priority[i].clazz;
@@ -353,7 +360,7 @@ app.directive('wantedItem', function() {
         } else if (craftNumber == 0) {
           return "Without CraftNumber";
         } else {
-          return "#"+craftNumber;
+          return "#" + craftNumber;
         }
         ;
       }
@@ -386,7 +393,7 @@ app.directive('wantedItem', function() {
         } else if (craftNumber == 0) {
           return "glyphicon glyphicon-remove";
         } else {
-          return "#"+craftNumber;
+          return "#" + craftNumber;
         }
         ;
       }
@@ -406,8 +413,6 @@ app.directive('wantedItem', function() {
           }
         }
       };
-
-
 
       $scope.currentPage = 0;
       $scope.pageSize = 10;
