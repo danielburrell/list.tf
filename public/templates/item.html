@@ -85,8 +85,8 @@
         </tr>
         <tr class="visible-xs">
           <th></th>
-          <th><span class="glyphicon glyphicon-thumbs-up"></span>/<span class="glyphicon glyphicon-ok"></span></th>
-          <th><img class="img-rounded" alt="" src="/assets/images/quality.png"></th>
+          <th class="text-center"><span class="glyphicon glyphicon-thumbs-up"></span>/<span class="glyphicon glyphicon-ok"></span></th>
+          <th class="text-center">Q</th>
           <th><span style="font-family: item_icons">&#57477;</span></th>
           <th><span style="font-family: item_icons">&#58456;</span></th>
           <th><span style="font-family: item_icons">&#58465;</span></th>
@@ -96,7 +96,7 @@
           <th><span style="font-family: item_icons">&#58372;</span></th>
         </tr>
       </thead>
-      <tr ng-repeat="detail in item.details | orderBy:['isObtained','priority']">
+      <tr ng-repeat="detail in item.details | orderBy:['isObtained','-priority']">
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]">
           <div class="btn-group btn-group-xs" ng-show="steamId == mySteamId">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -106,10 +106,16 @@
               <li><a href="javascript:;" ng-click="edit(detail.detailId)"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
               <li><a href="javascript:;" ng-click="markAsObtained(detail.detailId)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a></li>
               <li class="divider"></li>
-              <li ng-class="{true:'disabled'}[detail.priority > 2]"><a href="javascript:;" ng-click="increasePriority(detail.detailId, detail.priority)"><span
-                  class="glyphicon glyphicon-arrow-up"></span> Increase Priority</a></li>
-              <li ng-class="{true: 'disabled'}[detail.priority<1]"><a href="javascript:;" ng-click="decreasePriority(detail.detailId, detail.priority)"><span class="glyphicon glyphicon-arrow-down"></span> Decrease Priority</a></li>
+              <li ng-class="{true:'disabled'}[detail.priority == 3]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 3)"><span
+                  class="glyphicon glyphicon-exclamation-sign"></span> Critical Priority ({{detail.detailId}})</a></li>
+              <li ng-class="{true: 'disabled'}[detail.priority == 2]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 2)"><span
+                  class="glyphicon glyphicon-arrow-up"></span> High Priority ({{detail.detailId}})</a></li>
+              <li ng-class="{true:'disabled'}[detail.priority == 1]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 1)"><span
+                  class="glyphicon glyphicon-arrow-up"></span> Medium Priority ({{detail.detailId}})</a></li>
+              <li ng-class="{true:'disabled'}[detail.priority == 0]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 0)"><span
+                  class="glyphicon glyphicon-arrow-down"></span> Low Priority ({{detail.detailId}})</a></li>
               <li class="divider"></li>
+
               <li ng-click="showDeleteDetail(detail.detailId)" data-toggle="modal" data-target="#delete"><a href="javascript:;"><span
                   class="glyphicon glyphicon-remove"></span> Delete</a></li>
             </ul>
@@ -119,8 +125,8 @@
             Wanted</span><span class="label label-primary visible-xs"><span class="glyphicon glyphicon-thumbs-up"></span></span></td>
         <td ng-show="detail.isObtained" class="success"><span class="label label-success hidden-xs"><span class="glyphicon glyphicon-ok"></span>
             Obtained</span><span class="label label-success visible-xs"><span class="glyphicon glyphicon-ok"></span></span></td>
-        <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs">{{qualityIdToShortString(detail.quality)}}</span>
-          <span class="hidden-xs">{{qualityIdToString(detail.quality)}}</span></td>
+        <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs"
+          ng-class="qualityIdToClassForLabel(detail.quality)">{{qualityIdToShortString(detail.quality)}}</span> <span class="hidden-xs">{{qualityIdToString(detail.quality)}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span>{{levelToString(detail.levelNumber)}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs" ng-class="tradableToClass(detail.isTradable)"></span><span
           class="hidden-xs">{{tradableToString(detail.isTradable)}}</span></td>

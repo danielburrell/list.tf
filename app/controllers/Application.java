@@ -45,7 +45,6 @@ import views.html.index;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class Application extends Controller {
 
@@ -536,14 +535,16 @@ public class Application extends Controller {
         detail.price = Objects.toString(row.get("price"));
         detail.quality = (Integer) row.get("quality");
         Object priority = row.get("priority");
-        if (priority == null) { priority = new Integer(0); }
+        if (priority == null) {
+          priority = new Integer(0);
+        }
         detail.priority = (Integer) priority;
         normalisationmap.get(wantedId).details.add(detail);
       }
 
     }
-    //apply priority
-    for (Item item:s.item){
+    // apply priority
+    for (Item item : s.item) {
       item.effectivePriority = maxOfWantedDetails(item.details);
     }
 
@@ -552,7 +553,7 @@ public class Application extends Controller {
 
   private static int maxOfWantedDetails(List<Detail> details) {
     int highest = 0;
-    for (Detail detail: details){
+    for (Detail detail : details) {
       if (!detail.isObtained && detail.priority > highest) {
         highest = detail.priority;
       }
@@ -568,7 +569,7 @@ public class Application extends Controller {
   public static Result addDetail(Long wantedId) {
     JsonNode json = request().body().asJson();// (Detail.class);
     Detail detail = Json.fromJson(json, Detail.class);
-    Logger.info("Validating..{}",json.asText());
+    Logger.info("Validating..{}", json.asText());
     boolean validDetail = validate(detail);
 
     if (validDetail) {
@@ -641,23 +642,29 @@ public class Application extends Controller {
     }
   }
 
-  public static Result priorityUp(long detailId) {
+  public static Result setPriority(long detailId, int priority) {
     // require index on [detailId & steamId]
     // delete from wanted.details where detailId = x and steamId = session()
-    long steamId = Long.parseLong(session("steamId"));
-    Object[] params = new Object[] { steamId, detailId };
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(DB.getDataSource());
-    SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate).withSchemaName("wanted").withProcedureName("increaseDetailPriority");
-    Logger.info("Executed");
-    Map<String, Object> result = call.execute(params);
-    Logger.info("Results: {}", Json.toJson(result));
-    long rowCount = (long) result.get("updated_row_count");
-    if ((rowCount > 0)) {
-      return ok(Json.newObject().put("rowCount", rowCount));
-    } else {
+    if (priority > 3 || priority < 0) {
       DeleteError error = new DeleteError();
       error.error = "Delete failed";
       return badRequest(Json.toJson(error));
+    } else {
+      long steamId = Long.parseLong(session("steamId"));
+      Object[] params = new Object[] { steamId, detailId, priority };
+      JdbcTemplate jdbcTemplate = new JdbcTemplate(DB.getDataSource());
+      SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate).withSchemaName("wanted").withProcedureName("setDetailPriority");
+      Logger.info("Executed");
+      Map<String, Object> result = call.execute(params);
+      Logger.info("Results: {}", Json.toJson(result));
+      long rowCount = (long) result.get("updated_row_count");
+      if ((rowCount > 0)) {
+        return ok(Json.newObject().put("rowCount", rowCount));
+      } else {
+        DeleteError error = new DeleteError();
+        error.error = "Delete failed";
+        return badRequest(Json.toJson(error));
+      }
     }
   }
 

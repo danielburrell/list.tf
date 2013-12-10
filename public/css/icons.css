@@ -7,3 +7,93 @@ td.strike {
   text-decoration: line-through;
   color:#C8C8C8;
 }
+
+.label-normal {
+  background-color: #B2B2B2;
+}
+
+.label-normal[href]:hover,
+.label-normal[href]:focus {
+  background-color: #B2B2B2;
+}
+
+.label-genuine {
+  background-color: #4D7455;
+}
+
+.label-genuine[href]:hover,
+.label-genuine[href]:focus {
+  background-color: #4D7455;
+}
+
+.label-vintage {
+  background-color: #476291;
+}
+
+.label-vintage[href]:hover,
+.label-vintage[href]:focus {
+  background-color: #476291;
+}
+
+.label-unusual {
+  background-color: #8650AC;
+}
+
+.label-unusual[href]:hover,
+.label-unusual[href]:focus {
+  background-color: #8650AC;
+}
+
+.label-unique {
+  background-color: #FFD700;
+}
+
+.label-unique[href]:hover,
+.label-unique[href]:focus {
+  background-color: #FFD700;
+}
+
+.label-community {
+  background-color: #70B04A;
+}
+
+.label-community[href]:hover,
+.label-community[href]:focus {
+  background-color: #70B04A;
+}
+
+.label-valve {
+  background-color: #A50F79;
+}
+
+.label-valve[href]:hover,
+.label-valve[href]:focus {
+  background-color: #A50F79;
+}
+
+.label-selfmade {
+  background-color: #70B04A;
+}
+
+.label-selfmade[href]:hover,
+.label-selfmade[href]:focus {
+  background-color: #70B04A;
+}
+
+.label-strange {
+  background-color: #CF6A32;
+}
+
+.label-strange[href]:hover,
+.label-strange[href]:focus {
+  background-color: #CF6A32;
+}
+
+.label-haunted {
+  background-color: #38F3AB;
+}
+
+.label-haunted[href]:hover,
+.label-haunted[href]:focus {
+  background-color: #38F3AB;
+}

@@ -74,12 +74,11 @@ app.directive('wantedItem', function() {
         ;
       };
 
-      $scope.pushIncreaseToModel = function(detailId) {
+      $scope.pushPriorityToModel = function(detailId, priority) {
         for ( var i = 0; i < $scope.items.length; i++) {
           for ( var j = 0; j < $scope.items[i].details.length; j++) {
             if ($scope.items[i].details[j].detailId == detailId) {
-              $scope.items[i].details[j].priority++;
-              $scope.items[i].recentlyChanged = 1;
+              $scope.items[i].details[j].priority = priority;
             }
           }
         }
@@ -87,17 +86,7 @@ app.directive('wantedItem', function() {
 
       };
 
-      $scope.pushDecreaseToModel = function(detailId) {
-        for ( var i = 0; i < $scope.items.length; i++) {
-          for ( var j = 0; j < $scope.items[i].details.length; j++) {
-            if ($scope.items[i].details[j].detailId == detailId) {
-              $scope.items[i].details[j].priority--;
-              $scope.items[i].recentlyChanged = 1;
-            }
-          }
-        }
-        ;
-      };
+
 
       $scope.pushStateChangeToModel = function(wantedId, state) {
         for ( var i = 0; i < $scope.items.length; i++) {
@@ -129,59 +118,68 @@ app.directive('wantedItem', function() {
       $scope.qualities = [ {
         "id" : "0",
         "name" : "Stock",
-        "shortName" : "Sk",
+        "shortName" : "S",
         "css" : "normal",
       }, {
         "id" : "1",
         "name" : "Genuine",
-        "shortName" : "Gen",
+        "shortName" : "G",
         "css" : "genuine",
       }, {
         "id" : "3",
         "name" : "Vintage",
-        "shortName" : "Vin",
+        "shortName" : "V",
         "css" : "vintage",
       }, {
         "id" : "5",
         "name" : "Unusual",
-        "shortName" : "Unu",
+        "shortName" : "U",
         "css" : "unusual",
       }, {
         "id" : "6",
         "name" : "Unique",
-        "shortName" : "Uni",
+        "shortName" : "U",
         "css" : "unique",
       }, {
         "id" : "7",
         "name" : "Community",
-        "shortName" : "Com",
+        "shortName" : "C",
         "css" : "community",
       }, {
         "id" : "8",
         "name" : "Valve",
-        "shortName" : "Val",
+        "shortName" : "V",
         "css" : "valve",
       }, {
         "id" : "9",
         "name" : "Self-Made",
-        "shortName" : "Sel",
+        "shortName" : "S",
         "css" : "selfmade",
       }, {
         "id" : "11",
         "name" : "Strange",
-        "shortName" : "Str",
+        "shortName" : "S",
         "css" : "strange",
       }, {
         "id" : "13",
         "name" : "Haunted",
-        "shortName" : "Hau",
+        "shortName" : "H",
         "css" : "haunted",
       }, {
         "id" : "-1",
         "name" : "Any Quality",
-        "shortName" : "Any",
+        "shortName" : "?",
         "css" : "default",
       } ];
+
+
+      $scope.qualityIdToClassForLabel = function(qualityId) {
+        for ( var i = 0; i < ($scope.qualities).length; i++) {
+          if ($scope.qualities[i].id == qualityId) {
+            return "label label-"+$scope.qualities[i].css;
+          }
+        }
+      }
 
       $scope.tradable = [ {
         "id" : "0",
@@ -224,31 +222,15 @@ app.directive('wantedItem', function() {
         });
       }
 
-      $scope.increasePriority = function(detailId, priority) {
-        console.log(priority);
-        if (priority < 3) {
-          url = '/api/priorityUp/' + detailId;
+      $scope.setPriority = function(detailId, priority) {
+          url = '/api/priority/' + detailId + '/' + priority;
           $http.post(url).success(function(data) {
-            $scope.pushIncreaseToModel(detailId);
+            $scope.pushPriorityToModel(detailId, priority);
           }).error(function(data, status, headers, config) {
             // TODO: Error
             // handling for add
             // detail
           });
-        }
-      }
-
-      $scope.decreasePriority = function(detailId, priority) {
-        if (priority > 0) {
-          url = '/api/priorityDown/' + detailId;
-          $http.post(url).success(function(data) {
-            $scope.pushDecreaseToModel(detailId);
-          }).error(function(data, status, headers, config) {
-            // TODO: Error
-            // handling for add
-            // detail
-          });
-        }
       }
 
       $scope.craftable = [ {
@@ -331,11 +313,12 @@ app.directive('wantedItem', function() {
 
       $scope.priorityToString = function(priority) {
         if (priority == undefined) {
-          priority = 0
+          priority = 0;
         }
-        ;
+
         for ( var i = 0; i < ($scope.priority).length; i++) {
           if ($scope.priority[i].id == priority) {
+
             return $scope.priority[i].name;
           }
         }
@@ -344,12 +327,14 @@ app.directive('wantedItem', function() {
       $scope.priorityToClass = function(priority) {
 
         if (priority == undefined) {
-          priority = 0
+          priority = 0;
         }
-        ;
+
         for ( var i = 0; i < ($scope.priority).length; i++) {
           if ($scope.priority[i].id == priority) {
+
             return $scope.priority[i].clazz;
+
           }
         }
       }
@@ -367,7 +352,6 @@ app.directive('wantedItem', function() {
 
       $scope.tooBigToFit = function(text) {
         return text.length > 8;
-        console.log(text.length);
       }
       $scope.levelToString = function(levelNumber) {
         if (levelNumber == 0) {
