@@ -92,7 +92,7 @@
           <th><span style="font-family: item_icons">&#58465;</span></th>
           <th><span style="font-family: item_icons">&#58465;</span>#</th>
           <th><span style="font-family: item_icons">&#57456;</span></th>
-          <th><span style="font-family: item_icons">&#57896;</span></th>
+          <th class="hidden-xs"><span style="font-family: item_icons">&#57896;</span></th>
           <th><span style="font-family: item_icons">&#58372;</span></th>
         </tr>
       </thead>
@@ -137,7 +137,8 @@
           ng-class="{true:'hidden-xs', false:''}[tooBigToFit(craftNumberToString(detail.craftNumber))]">{{craftNumberToString(detail.craftNumber)}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs"
           ng-class="giftwrapToClass(detail.isGiftWrapped)"></span><span class="hidden-xs">{{giftwrapToString(detail.isGiftWrapped)}}</span></td>
-        <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]">{{detail.price}}</td>
+        <td class="hidden-xs"  ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span
+          class="hidden-xs">{{detail.price}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs" ng-class="priorityToClass(detail.priority)"></span><span
           class="hidden-xs">{{priorityToString(detail.priority)}}</span></td>
       </tr>

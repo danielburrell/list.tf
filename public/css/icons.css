@@ -5,15 +5,14 @@
 
 td.strike {
   text-decoration: line-through;
-  color:#C8C8C8;
+  color: #C8C8C8;
 }
 
 .label-normal {
   background-color: #B2B2B2;
 }
 
-.label-normal[href]:hover,
-.label-normal[href]:focus {
+.label-normal[href]:hover,.label-normal[href]:focus {
   background-color: #B2B2B2;
 }
 
@@ -21,8 +20,7 @@ td.strike {
   background-color: #4D7455;
 }
 
-.label-genuine[href]:hover,
-.label-genuine[href]:focus {
+.label-genuine[href]:hover,.label-genuine[href]:focus {
   background-color: #4D7455;
 }
 
@@ -30,8 +28,7 @@ td.strike {
   background-color: #476291;
 }
 
-.label-vintage[href]:hover,
-.label-vintage[href]:focus {
+.label-vintage[href]:hover,.label-vintage[href]:focus {
   background-color: #476291;
 }
 
@@ -39,8 +36,7 @@ td.strike {
   background-color: #8650AC;
 }
 
-.label-unusual[href]:hover,
-.label-unusual[href]:focus {
+.label-unusual[href]:hover,.label-unusual[href]:focus {
   background-color: #8650AC;
 }
 
@@ -48,8 +44,7 @@ td.strike {
   background-color: #FFD700;
 }
 
-.label-unique[href]:hover,
-.label-unique[href]:focus {
+.label-unique[href]:hover,.label-unique[href]:focus {
   background-color: #FFD700;
 }
 
@@ -57,8 +52,7 @@ td.strike {
   background-color: #70B04A;
 }
 
-.label-community[href]:hover,
-.label-community[href]:focus {
+.label-community[href]:hover,.label-community[href]:focus {
   background-color: #70B04A;
 }
 
@@ -66,8 +60,7 @@ td.strike {
   background-color: #A50F79;
 }
 
-.label-valve[href]:hover,
-.label-valve[href]:focus {
+.label-valve[href]:hover,.label-valve[href]:focus {
   background-color: #A50F79;
 }
 
@@ -75,8 +68,7 @@ td.strike {
   background-color: #70B04A;
 }
 
-.label-selfmade[href]:hover,
-.label-selfmade[href]:focus {
+.label-selfmade[href]:hover,.label-selfmade[href]:focus {
   background-color: #70B04A;
 }
 
@@ -84,8 +76,7 @@ td.strike {
   background-color: #CF6A32;
 }
 
-.label-strange[href]:hover,
-.label-strange[href]:focus {
+.label-strange[href]:hover,.label-strange[href]:focus {
   background-color: #CF6A32;
 }
 
@@ -93,7 +84,11 @@ td.strike {
   background-color: #38F3AB;
 }
 
-.label-haunted[href]:hover,
-.label-haunted[href]:focus {
+.label-haunted[href]:hover,.label-haunted[href]:focus {
   background-color: #38F3AB;
+}
+
+
+
+
 }
