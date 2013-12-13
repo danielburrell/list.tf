@@ -1,3 +1,8 @@
+<form style="visibility:hidden" id='outpostSearch' action='http://www.tf2outpost.com/search' method='post' target='_blank'>
+      <input type='hidden' id='outpostJson' name='json'/>
+      <input type='submit' id='outpostSubmit' name='submit' value='Submit!'/>
+    </form>
+
 
 <form class="form-horizontal" role="form">
   <div class="form-group">
@@ -21,6 +26,7 @@
       </div>
     </div>
   </div>
+  </form>
   <ul class="pager">
     <li ng-class="{true:'previous disabled', false:'previous'}[currentPage == 0]"><a href="javascript:;" ng-click="previous(currentPage)">&larr;
         Previous</a></li>
@@ -34,7 +40,9 @@
       <span class="badge">{{item.itemId}}</span>&nbsp;{{item.name}} <span class="glyphicon glyphicon-thumbs-up" ng-show="item.state == filter.unobtained.key"></span>
       <span class="glyphicon glyphicon-thumbs-down" ng-show="item.state == filter.unwanted.key"></span> <span class="glyphicon glyphicon-ok"
         ng-show="item.state == filter.obtained.key"></span> <span class="glyphicon glyphicon-question-sign" ng-show="item.state == filter.unknown.key"></span>
-      <div class="btn-group btn-group-xs pull-right hidden-xs">
+
+
+    </div><div class="btn-group btn-group-xs pull-right hidden-xs">
         <button ng-show="steamId == mySteamId" ng-click="markAs(item.wantedId,filter.unobtained.key)" type="button" class="btn btn-primary">
           <span class="glyphicon glyphicon-thumbs-up"></span> Wanted
         </button>
@@ -51,8 +59,7 @@
           data-target="#myModal">
           <span class="glyphicon glyphicon-plus"></span> Add Detail
         </button>
-      </div>
-      <div class="btn-group btn-group-xs pull-right visible-xs" ng-show="steamId == mySteamId">
+      </div><div class="btn-group btn-group-xs pull-right visible-xs" ng-show="steamId == mySteamId">
         <button ng-show="steamId == mySteamId" type="button" class="btn btn-default dropdown-toggle pull-right" data-toggle="dropdown">
           <span class="caret"></span>
         </button>
@@ -68,7 +75,6 @@
               class="glyphicon glyphicon-plus"></span> Add Detail</a></li>
         </ul>
       </div>
-    </div>
     <table class="table table-condensed">
       <thead>
         <tr class="hidden-xs">
@@ -107,17 +113,23 @@
               <li><a href="javascript:;" ng-click="markAsObtained(detail.detailId)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a></li>
               <li class="divider"></li>
               <li ng-class="{true:'disabled'}[detail.priority == 3]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 3)"><span
-                  class="glyphicon glyphicon-exclamation-sign"></span> Critical Priority ({{detail.detailId}})</a></li>
+                  class="glyphicon glyphicon-exclamation-sign"></span> Critical Priority</a></li>
               <li ng-class="{true: 'disabled'}[detail.priority == 2]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 2)"><span
-                  class="glyphicon glyphicon-arrow-up"></span> High Priority ({{detail.detailId}})</a></li>
+                  class="glyphicon glyphicon-arrow-up"></span> High Priority</a></li>
               <li ng-class="{true:'disabled'}[detail.priority == 1]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 1)"><span
-                  class="glyphicon glyphicon-arrow-up"></span> Medium Priority ({{detail.detailId}})</a></li>
+                  class="glyphicon glyphicon-arrow-up"></span> Medium Priority</a></li>
               <li ng-class="{true:'disabled'}[detail.priority == 0]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 0)"><span
-                  class="glyphicon glyphicon-arrow-down"></span> Low Priority ({{detail.detailId}})</a></li>
+                  class="glyphicon glyphicon-arrow-down"></span> Low Priority</a></li>
               <li class="divider"></li>
 
               <li ng-click="showDeleteDetail(detail.detailId)" data-toggle="modal" data-target="#delete"><a href="javascript:;"><span
                   class="glyphicon glyphicon-remove"></span> Delete</a></li>
+
+
+
+                  <li ng-class=""><a href="javascript:;" ng-click="outpostSearch(item.itemId, detail.levelNumber, detail.quality)"><span
+                  class="glyphicon glyphicon-search"></span> Search </a></li>
+
             </ul>
           </div>
         </td>

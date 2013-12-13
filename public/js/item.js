@@ -233,6 +233,15 @@ app.directive('wantedItem', function() {
           });
       }
 
+
+      $scope.outpostSearch = function(itemId, level, quality) {
+       indata = {"has1":"440,"+itemId+","+quality+"","filters":{"has1":{"ext":{"level":""+level}}}};
+        $("#outpostJson").val(JSON.stringify(indata));
+        $('#outpostSubmit').click();
+
+
+      }
+
       $scope.craftable = [ {
         "id" : "0",
         "name" : "Uncraftable",
