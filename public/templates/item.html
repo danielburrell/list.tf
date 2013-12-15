@@ -139,7 +139,7 @@
           </div>
         </td>
         <td class="hidden-xs"><button ng-click="outpostSearch(item.itemId, detail.levelNumber, detail.quality)" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-search"></span></button></td>
-        <td class="hidden-xs"><button class="btn btn-xs btn-default">wiki</button></td>
+        <td class="hidden-xs"><button ng-click="wiki(item.itemId)" class="btn btn-xs btn-default">wiki</button></td>
         <td ng-show="!detail.isObtained" class="primary"><span class="label label-primary hidden-xs"><span class="glyphicon glyphicon-thumbs-up"></span>
             Wanted</span><span class="label label-primary visible-xs"><span class="glyphicon glyphicon-thumbs-up"></span></span></td>
         <td ng-show="detail.isObtained" class="success"><span class="label label-success hidden-xs"><span class="glyphicon glyphicon-ok"></span>

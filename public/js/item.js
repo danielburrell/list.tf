@@ -7,7 +7,7 @@ app.directive('wantedItem', function() {
       mySteamId : '=mySteamId',
     },
     templateUrl : '/assets/templates/item.html',
-    controller : [ '$scope', '$http', function($scope, $http) {
+    controller : [ '$scope', '$http','$window', function($scope, $http,$window) {
       $scope.addDetail = function() {
         url = '/api/addDetail/' + $scope.proposedDetail.wantedId;
         $http.post(url, $scope.proposedDetail).success(function(data) {
@@ -102,6 +102,14 @@ app.directive('wantedItem', function() {
       }
 
 
+
+
+      $scope.wiki = function(itemId) {
+
+        $window.open('http://wiki.teamfortress.com/scripts/itemredirect.php?id='+itemId+'&lang=en_US');
+
+
+      }
 
       $scope.pushStateChangeToModel = function(wantedId, state) {
         for ( var i = 0; i < $scope.items.length; i++) {
