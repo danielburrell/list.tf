@@ -24,6 +24,9 @@ POST     /api/addDetail/:wantedId                        controllers.Application
 POST     /api/editDetail/detailId/:detailId                           controllers.Application.editDetail(detailId: Long)
 POST     /api/deleteDetail/:detailId                           controllers.Application.deleteDetail(detailId: Long)
 POST     /api/markAs/:detailId/:state                           controllers.Application.markAs(detailId: Long, state: Long)
+POST     /api/markDetailAs/:detailId/:isObtained                           controllers.Application.markDetailAs(detailId: Long, isObtained: Boolean)
+
+
 GET     /loginStatus                         controllers.Application.loginStatus()
 GET     /getName/:steamId                         controllers.Application.getName(steamId: Long)
 

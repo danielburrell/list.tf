@@ -90,5 +90,7 @@ td.strike {
 
 
 
-
+.panel-heading {
+height: 64px;
+padding: 0px 0px;
 }

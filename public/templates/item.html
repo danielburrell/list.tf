@@ -36,13 +36,12 @@
     ng-repeat="item in items | stateFilter:selectedState | filter:search |  orderBy:'effectivePriority':true | startFrom:currentPage*pageSize | limitTo:pageSize"
     ng-class="{3 : 'panel panel-success', 2 : 'panel panel-warning', 1 : 'panel panel-primary', 0 : 'panel panel-danger'}[item.state]">
     <div class="panel-heading">
-      <img class="pull-left img-thumbnail media-object" style="position: relative; top: -10px; left: -15px;" height="64" width="64" src="{{item.image}}" alt="" />
+      <img class="pull-left img-thumbnail media-object" style="margin-right:10px;" height="64" width="64" src="{{item.image}}" alt="" />
       <span class="badge">{{item.itemId}}</span>&nbsp;{{item.name}} <span class="glyphicon glyphicon-thumbs-up" ng-show="item.state == filter.unobtained.key"></span>
       <span class="glyphicon glyphicon-thumbs-down" ng-show="item.state == filter.unwanted.key"></span> <span class="glyphicon glyphicon-ok"
         ng-show="item.state == filter.obtained.key"></span> <span class="glyphicon glyphicon-question-sign" ng-show="item.state == filter.unknown.key"></span>
 
-
-    </div><div class="btn-group btn-group-xs pull-right hidden-xs">
+<div class="btn-group btn-group-xs pull-right hidden-xs">
         <button ng-show="steamId == mySteamId" ng-click="markAs(item.wantedId,filter.unobtained.key)" type="button" class="btn btn-primary">
           <span class="glyphicon glyphicon-thumbs-up"></span> Wanted
         </button>
@@ -59,7 +58,8 @@
           data-target="#myModal">
           <span class="glyphicon glyphicon-plus"></span> Add Detail
         </button>
-      </div><div class="btn-group btn-group-xs pull-right visible-xs" ng-show="steamId == mySteamId">
+      </div>
+    </div><div class="btn-group btn-group-xs pull-right visible-xs" ng-show="steamId == mySteamId">
         <button ng-show="steamId == mySteamId" type="button" class="btn btn-default dropdown-toggle pull-right" data-toggle="dropdown">
           <span class="caret"></span>
         </button>
@@ -76,8 +76,9 @@
         </ul>
       </div>
     <table class="table table-condensed">
-      <thead>
-        <tr class="hidden-xs">
+
+      <thead ng-hide="item.details == 0">
+        <tr class="hidden-xs" >
           <th></th>
           <th>Obtained</th>
           <th>Quality</th>
@@ -85,7 +86,7 @@
           <th>Tradable</th>
           <th>Craftable</th>
           <th>Craft Number</th>
-          <th>Giftwrapped</th>
+          <th>Giftwrap</th>
           <th>Price</th>
           <th>Priority</th>
         </tr>
@@ -110,7 +111,9 @@
             </button>
             <ul class="dropdown-menu" role="menu">
               <li><a href="javascript:;" ng-click="edit(detail.detailId)"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
-              <li><a href="javascript:;" ng-click="markAsObtained(detail.detailId)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a></li>
+              <li><a ng-show="detail.isObtained == false" href="javascript:;" ng-click="markDetailAs(detail.detailId, true)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a>
+              <a ng-show="detail.isObtained == true" href="javascript:;" ng-click="markDetailAs(detail.detailId, false)"><span class="glyphicon glyphicon-ok"></span> Mark as Unobtained</a>
+              </li>
               <li class="divider"></li>
               <li ng-class="{true:'disabled'}[detail.priority == 3]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 3)"><span
                   class="glyphicon glyphicon-exclamation-sign"></span> Critical Priority</a></li>
@@ -138,7 +141,7 @@
         <td ng-show="detail.isObtained" class="success"><span class="label label-success hidden-xs"><span class="glyphicon glyphicon-ok"></span>
             Obtained</span><span class="label label-success visible-xs"><span class="glyphicon glyphicon-ok"></span></span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs"
-          ng-class="qualityIdToClassForLabel(detail.quality)">{{qualityIdToShortString(detail.quality)}}</span> <span class="hidden-xs">{{qualityIdToString(detail.quality)}}</span></td>
+          ng-class="qualityIdToClassForLabel(detail.quality)">{{qualityIdToShortString(detail.quality)}}</span> <span class="hidden-xs" ng-class="qualityIdToClassForLabel(detail.quality)">{{qualityIdToString(detail.quality)}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span>{{levelToString(detail.levelNumber)}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs" ng-class="tradableToClass(detail.isTradable)"></span><span
           class="hidden-xs">{{tradableToString(detail.isTradable)}}</span></td>
@@ -146,7 +149,7 @@
           class="hidden-xs">{{craftableToString(detail.isCraftable)}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs"
           ng-class="craftNumberToClass(detail.craftNumber)"></span><span
-          ng-class="{true:'hidden-xs', false:''}[tooBigToFit(craftNumberToString(detail.craftNumber))]">{{craftNumberToString(detail.craftNumber)}}</span></td>
+          ng-class="{true:'hidden-xs', false:''}[isNumber(craftNumberToString(detail.craftNumber))]">{{craftNumberToString(detail.craftNumber)}}</span></td>
         <td ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span class="visible-xs"
           ng-class="giftwrapToClass(detail.isGiftWrapped)"></span><span class="hidden-xs">{{giftwrapToString(detail.isGiftWrapped)}}</span></td>
         <td class="hidden-xs"  ng-class="{true:'strike success', false:'primary'}[detail.isObtained]"><span

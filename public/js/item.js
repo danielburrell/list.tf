@@ -87,6 +87,21 @@ app.directive('wantedItem', function() {
       };
 
 
+      $scope.isNumber = function(text){
+        if (text=="None") return true;
+      }
+      $scope.pushMarkAsToModel = function(detailId, state) {
+        for ( var i = 0; i < $scope.items.length; i++) {
+          for ( var j = 0; j < $scope.items[i].details.length; j++) {
+            if ($scope.items[i].details[j].detailId == detailId) {
+              $scope.items[i].details[j].isObtained = state;
+            }
+          }
+        }
+        ;
+      }
+
+
 
       $scope.pushStateChangeToModel = function(wantedId, state) {
         for ( var i = 0; i < $scope.items.length; i++) {
@@ -233,6 +248,18 @@ app.directive('wantedItem', function() {
           });
       }
 
+      $scope.markDetailAs = function(detailId, isObtained) {
+        console.log(isObtained);
+        url = '/api/markDetailAs/' + detailId + '/' + isObtained;
+        $http.post(url).success(function(data) {
+          $scope.pushMarkAsToModel(detailId, isObtained);
+        }).error(function(data, status, headers, config) {
+          // TODO: Error
+          // handling for add
+          // detail
+        });
+    }
+
 
       $scope.outpostSearch = function(itemId, level, quality) {
        indata = {"has1":"440,"+itemId+","+quality+"","filters":{"has1":{"ext":{"level":""+level}}}};
@@ -274,7 +301,7 @@ app.directive('wantedItem', function() {
 
       $scope.giftwrapped = [ {
         "id" : "0",
-        "name" : "Not Wrapped",
+        "name" : "None",
         "clazz" : "glyphicon glyphicon-remove"
       }, {
         "id" : "1",
@@ -352,7 +379,7 @@ app.directive('wantedItem', function() {
         if (craftNumber == -1) {
           return "Don't Care";
         } else if (craftNumber == 0) {
-          return "Without CraftNumber";
+          return "None";
         } else {
           return "#" + craftNumber;
         }

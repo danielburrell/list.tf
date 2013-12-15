@@ -425,6 +425,8 @@ public class Application extends Controller {
 
   }
 
+
+
   public static Promise<Result> getName(Long steamId) {
     Promise<Result> p = WS.url(playerSummaryUrl).setQueryParameter("key", steamApiKey).setQueryParameter("steamIds", steamId.toString()).get()
         .map(new Function<WS.Response, Result>() {
@@ -687,6 +689,19 @@ public class Application extends Controller {
       return badRequest(Json.toJson(error));
     }
   }
+
+  public static Result markDetailAs(Long detailId, Boolean isObtained) {
+    // TODO extract the detailid, isObtained to true
+    long steamId = Long.parseLong(session("steamId"));
+    Object[] params = new Object[] { steamId, detailId, isObtained };
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DB.getDataSource());
+    SimpleJdbcCall call = new SimpleJdbcCall(jdbcTemplate).withSchemaName("wanted").withProcedureName("markDetailAs");
+    Logger.info("Executed");
+    Map<String, Object> result = call.execute(params);
+    Logger.info("Results: {}", Json.toJson(result));
+    return ok(Json.newObject().put("rowCount", 1));
+  }
+
 
   public static Result markAs(Long wantedId, Long state) {
     // requires index on [detailId & steamId]
