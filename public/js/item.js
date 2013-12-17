@@ -270,7 +270,10 @@ app.directive('wantedItem', function() {
 
 
       $scope.outpostSearch = function(itemId, level, quality) {
-       indata = {"has1":"440,"+itemId+","+quality+"","filters":{"has1":{"ext":{"level":""+level}}}};
+       if (level != 0 && quality != -1) { console.log("both"); indata = {"has1":"440,"+itemId+","+quality+"","filters":{"has1":{"ext":{"level":""+level}}}}; };
+       if (level == 0 && quality != -1) { console.log("no level"); indata = {"has1":"440,"+itemId+","+quality+""}; };
+       if (level != 0 && quality == -1) { console.log("noq uality"); indata = {"has1":"440,"+itemId+","+6+"","filters":{"has1":{"ext":{"level":""+level}}}}; };
+       if (level == 0 && quality == -1) { console.log("neither"); indata = {"has1":"440,"+itemId+","+6+""}; };
         $("#outpostJson").val(JSON.stringify(indata));
         $('#outpostSubmit').click();
 
