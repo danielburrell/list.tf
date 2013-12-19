@@ -39,6 +39,8 @@ public class Global extends GlobalSettings {
     schemaNameMaxLength = Integer.parseInt(Play.application().configuration().getString("schemaNameMaxLength"));
   }
 
+
+  //TODO: schedule http://backpack.tf/api/IGetPrices/v3/?format=json&key=?
   @Override
   public void onStart(Application app) {
     Logger.info("Scheduling schema watcher");

@@ -5,7 +5,8 @@
 angular.module('myApp.controllers', [ 'wantedItem', 'wantedNav', 'wantedFooter' ]).controller('MyCtrl1',
     [ '$routeParams', '$scope', '$http', function($routeParams, $scope, $http) {
 
-      $scope.getLoginStatus = function() {
+      $scope.id = $routeParams.id;
+      //$scope.getLoginStatus = function() {
 
         $http.get('/loginStatus').success(function(data) {
           $scope.loggedIn = data.loggedIn;
@@ -14,20 +15,23 @@ angular.module('myApp.controllers', [ 'wantedItem', 'wantedNav', 'wantedFooter' 
           }
         });
 
-      }
+      //}
 
-      $scope.getnameStatus = function() {
+      $scope.name = undefined;
+      $scope.avatar = undefined;
+
+      //$scope.getnameStatus = function() {
 
         $http.get('/getName/' + $scope.id).success(function(data) {
           $scope.name = data.name;
           $scope.avatar = data.avatar;
         });
 
-      }
+      //}
 
-      $scope.id = $routeParams.id;
-      $scope.getLoginStatus();
-      $scope.getnameStatus();
+
+     // $scope.getLoginStatus();
+      //$scope.getnameStatus();
       // maybe put this inside the widget
 
       console.log($routeParams);

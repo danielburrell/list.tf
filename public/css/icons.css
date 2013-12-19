@@ -8,8 +8,14 @@ td.strike {
   color: #C8C8C8;
 }
 
+.label {
+  height:20px;
+  vertical-align:middle;
+}
+
 .label-normal {
   background-color: #B2B2B2;
+}
 }
 
 .label-normal[href]:hover,.label-normal[href]:focus {
