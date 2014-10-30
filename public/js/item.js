@@ -268,12 +268,12 @@ app.directive('wantedItem', function() {
         });
     }
 
-
+      
       $scope.outpostSearch = function(itemId, level, quality) {
-       if (level != 0 && quality != -1) { console.log("both"); indata = {"has1":"440,"+itemId+","+quality+"","filters":{"has1":{"ext":{"level":""+level}}}}; };
-       if (level == 0 && quality != -1) { console.log("no level"); indata = {"has1":"440,"+itemId+","+quality+""}; };
-       if (level != 0 && quality == -1) { console.log("noq uality"); indata = {"has1":"440,"+itemId+","+6+"","filters":{"has1":{"ext":{"level":""+level}}}}; };
-       if (level == 0 && quality == -1) { console.log("neither"); indata = {"has1":"440,"+itemId+","+6+""}; };
+       if (level != 0 && quality != -1) { console.log("both"); indata = {"attributes":{"has1":{"level":""+level}},"match_all":false,"has1":"440,"+itemId+","+quality}; };
+       if (level == 0 && quality != -1) { console.log("no level"); indata = {"attributes":{},"match_all":false,"has1":"440,"+itemId+","+quality}; };
+       if (level != 0 && quality == -1) { console.log("noq uality"); indata = {"attributes":{"has1":{"level":""+level}},"match_all":false,"has1":"440,"+itemId+",any"}; };
+       if (level == 0 && quality == -1) { console.log("neither"); indata = {"attributes":{},"match_all":false,"has1":"440,"+itemId+",any"}; };
         $("#outpostJson").val(JSON.stringify(indata));
         $('#outpostSubmit').click();
 
