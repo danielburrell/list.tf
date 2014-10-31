@@ -662,7 +662,7 @@ public class Application extends Controller {
                         detail.isObtained = isObtained;
                         WriteResult u = userCollection.update("{steamId:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.details:#}}", item.details);
                         Logger.info("Results: {}",u.getN());
-                        return ok(Json.newObject().put("rowCount", 1));
+                        return ok(Json.newObject().put("rowCount", u.getN()));
                     }
                 }
             }
