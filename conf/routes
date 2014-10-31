@@ -20,7 +20,7 @@ GET    /partial/list.html    controllers.Application.wantedPartial()
 
 # JSON requests
 GET     /api/getWantedList/:steamId                           controllers.Application.getWantedList(steamId: Long)
-POST     /api/addDetail/:wantedId                        controllers.Application.addDetail(wantedId: Long)
+POST     /api/addDetail                        controllers.Application.addDetail()
 POST     /api/editDetail/detailId/:detailId                           controllers.Application.editDetail(detailId: Long)
 POST     /api/deleteDetail/:detailId                           controllers.Application.deleteDetail(detailId: Long)
 POST     /api/markAs/:detailId/:state                           controllers.Application.markAs(detailId: Long, state: Long)

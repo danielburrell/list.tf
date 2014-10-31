@@ -2,37 +2,21 @@ package models;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+public class SteamUser {
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
-
-@Entity
-@Table
-public class SteamUser extends Model{
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 3637338062178285436L;
-
-    @Id
+    // Id representing the user
     public Long steamId;
 
+    // version of the schema that this user is currently running on
     public Long schemaId;
 
+    // display name of this user
     public String name;
 
+    // display avatar of this user (http url)
     public String avatar;
 
-    @OneToMany(cascade=CascadeType.ALL)
+    // list of items this user wants
     public List<Item> item;
 
-    public static Finder<Long,SteamUser> find = new Finder<Long,SteamUser>(
-            Long.class, SteamUser.class
-          );
 }

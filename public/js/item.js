@@ -9,8 +9,9 @@ app.directive('wantedItem', function() {
     templateUrl : '/assets/templates/item.html',
     controller : [ '$scope', '$http','$window', function($scope, $http,$window) {
       $scope.addDetail = function() {
-        url = '/api/addDetail/' + $scope.proposedDetail.wantedId;
-        $http.post(url, $scope.proposedDetail).success(function(data) {
+        url = '/api/addDetail';
+        
+        $http.post(url, {"wantedId":$scope.proposedDetail.wantedId,"details":[$scope.proposedDetail]}).success(function(data) {
         }).error(function(data, status, headers, config) {
           // TODO: Error
           // handling for add

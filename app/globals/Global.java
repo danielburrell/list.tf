@@ -1,135 +1,127 @@
 package globals;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.joda.time.DateTime;
+import org.jongo.Jongo;
+import org.jongo.MongoCollection;
 
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
 import play.Play;
-import play.db.DB;
 import play.libs.Akka;
 import play.libs.F.Function;
 import play.libs.WS;
-import play.mvc.Result;
 import scala.concurrent.duration.Duration;
 import uk.co.solong.tf2.schema.Items;
+import uk.co.solong.tf2.schema.Result;
 import uk.co.solong.tf2.schema.Schema;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
+import com.mongodb.WriteConcern;
 
 public class Global extends GlobalSettings {
-  private static String schemaUrl;
-  private static String schemaKey;
-  private static String language;
-  private static int schemaNameMaxLength;
-  @Override
-  public void beforeStart(Application app) {
-    // Initialise configuration
-    super.beforeStart(app);
+    private static Jongo jongo;
+    private static MongoCollection schemaCollection;
+    private static String schemaUrl;
+    private static String schemaKey;
+    private static String language;
 
-    schemaUrl = Play.application().configuration().getString("schemaUrl");
-    schemaKey = Play.application().configuration().getString("apiKey");
-    language = Play.application().configuration().getString("language");
-    schemaNameMaxLength = Integer.parseInt(Play.application().configuration().getString("schemaNameMaxLength"));
-  }
+    @Override
+    public void beforeStart(Application app) {
+        // Initialise configuration
+        super.beforeStart(app);
+        try {
+            DB db = new MongoClient("127.0.0.1",27017).getDB("list");
+            jongo = new Jongo(db);
+            schemaCollection = jongo.getCollection("schema").withWriteConcern(WriteConcern.ACKNOWLEDGED);
+            
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        // Jongo jongo = new Jongo(db);
 
+        schemaUrl = Play.application().configuration().getString("schemaUrl");
+        schemaKey = Play.application().configuration().getString("apiKey");
+        language = Play.application().configuration().getString("language");
+    }
 
-  //TODO: schedule http://backpack.tf/api/IGetPrices/v3/?format=json&key=?
-  @Override
-  public void onStart(Application app) {
-    Logger.info("Scheduling schema watcher");
-    Akka.system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS), Duration.create(1, TimeUnit.HOURS),
+    // TODO: schedule http://backpack.tf/api/IGetPrices/v3/?format=json&key=?
+    @Override
+    public void onStart(Application app) {
+        Logger.info("Scheduling schema watcher");
+        Akka.system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS), Duration.create(1, TimeUnit.HOURS),
 
-    new Runnable() {
+        new Runnable() {
 
-      private JdbcTemplate jdbcTemplate = new JdbcTemplate(DB.getDataSource());
+            public void run() {
+                WS.url(schemaUrl).setQueryParameter("key", schemaKey).setQueryParameter("language", language).get().map(new Function<WS.Response, Result>() {
 
-      public void run() {
-        WS.url(schemaUrl).setQueryParameter("key", schemaKey).setQueryParameter("language", language).get().map(new Function<WS.Response, Result>() {
+                    public Result apply(WS.Response response) {
+                        try {
+                            Logger.info("Fetching schema data");
+                            InputStream input = response.getBodyAsStream();
+                            Reader streamReader = new InputStreamReader(input, "UTF-8");
+                            ObjectMapper m = new ObjectMapper();
+                            ObjectReader reader = m.reader(Schema.class);
+                            Schema remoteSchema = reader.readValue(streamReader);
+                            streamReader.close();
+                            Schema localSchema = getLocalSchema();
+                            List<Items> remoteSchemaItems = remoteSchema.getResult().getItems();
+                            List<Items> localSchemaItems = localSchema.getResult().getItems();
+                            // get the difference in the items.
+                            remoteSchemaItems.removeAll(localSchemaItems);
+                            if (remoteSchemaItems.size() > 0) {
+                                Logger.info("Schema change detected. {} items to add.", remoteSchemaItems.size());
+                                remoteSchema.setSchemaVersion(DateTime.now().getMillis());
+                                schemaCollection.insert(remoteSchema);
+                                Logger.info("Schema check complete. Schema was changed.");
+                            } else {
+                                Logger.info("Schema check complete. Schema was not changed.");
+                            }
+                            return null;
+                        } catch (Throwable e) {
+                            Logger.error("Unexpected exception caught: {}",e);
+                        }
+                        return null;
+                    }
 
+                    private Schema getLocalSchema() {
+                        Logger.info("Fetching known items");
+                        // get the latest schema.
+                        Schema c = schemaCollection.findOne("").orderBy("{schemaVersion:-1}").as(Schema.class);
+                        if (c == null) {
+                            Logger.warn("LocalSchema was null. Only acceptable on first run");
+                            Schema s = new Schema();
+                            Result result = new Result();
+                            result.setItems(new ArrayList<Items>());
+                            s.setResult(result);
+                            return s;
+                        } else {
+                        
+                        return c;
+                        }
+                        
+                    }
 
-          public Result apply(WS.Response response) {
-            try {
-
-              Logger.info("Fetching schema data");
-              String node = response.getBody();
-              ObjectMapper om = new ObjectMapper();
-              Schema s;
-
-              s = om.readValue(node, Schema.class);
-
-              List<Items> schemaItems = s.getResult().getItems();
-              List<Items> knownItems = getKnownItems();
-              // get the difference in the items.
-              schemaItems.removeAll(knownItems);
-              if (schemaItems.size() > 0) {
-                Logger.info("Schema change detected");
-                {// TODO:begin transaction
-                  StringBuilder sb = new StringBuilder();
-                  for (Items item : schemaItems) {
-                    addItemToSchema(item);
-                    sb.append(item.getItem_name()).append(", ").append(item.getDefindex()).append("\n");
-                  }
-                  Logger.info("Items added:\n{}", sb.toString());
-                }
-                // finally update the schemaId
-                updateSchemaVersionNumber();
-                // TODO: evict the schema from
-                // the
-                // cache
-                Logger.info("Schema check complete. Schema was changed.");
-              } else {
-                Logger.info("Schema check complete. Schema was not changed.");
-              }
-              return null;
-            } catch (Exception e) {
-              // TODO Auto-generated catch block
-              e.printStackTrace();
+                });
             }
-            return null;
-          }
+        },
 
-          private void updateSchemaVersionNumber() {
-            Logger.info("Updating schema version");
-            Object[] params = new Object[] { new java.sql.Timestamp(new java.util.Date().getTime()) };
-            jdbcTemplate.update("CALL `wanted`.`addSchemaVersion`(?)", params);
-          }
+        Akka.system().dispatcher()
 
-          private void addItemToSchema(Items item) {
-              item.setItem_name(item.getItem_name().replaceAll("[\u0000-\u001f]", ""));
-              item.setItem_name(item.getItem_name().substring(0, Math.min(item.getItem_name().length(),schemaNameMaxLength)));
-              Object[] params = new Object[] { item.getDefindex(), item.getItem_name(), item.getImage_url() };
-              jdbcTemplate.update("CALL `wanted`.`addSchemaItem`(?, ?, ?)", params);
+        );
 
-          }
-
-          private List<Items> getKnownItems() {
-            Logger.info("Fetching known items");
-            List<Items> result = jdbcTemplate.query("CALL `wanted`.`getSchema`()", new RowMapper<Items>() {
-              @Override
-              public Items mapRow(ResultSet rs, int row) throws SQLException {
-                Items item = new Items();
-                item.setDefindex(rs.getLong("item_id"));
-                item.setName(rs.getString("item_name"));
-                return item;
-              }
-            });
-            return result;
-          }
-
-        });
-      }
-    },
-
-    Akka.system().dispatcher()
-
-    );
-
-  }
+    }
 }

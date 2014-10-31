@@ -15,8 +15,9 @@ app.directive('wantedDialog', function() {
     controller : [ '$scope', '$http', function($scope, $http) {
 
       $scope.addDetail = function() {
-        url = '/api/addDetail/' + $scope.proposedDetail.wantedId;
-        $http.post(url, $scope.proposedDetail.details).success(function(data) {
+        url = '/api/addDetail';
+        
+        $http.post(url, {"wantedId":$scope.proposedDetail.wantedId,"details":[$scope.proposedDetail.details]}).success(function(data) {
           console.log(data);
           console.log("sending" + data.wantedId + "and" + data.details[0]);
           $scope.pushDetailFunction({

@@ -11,7 +11,9 @@ libraryDependencies ++= Seq(
   "org.springframework" % "spring-jdbc" % "3.2.4.RELEASE",
   "org.springframework" % "spring-core" % "3.2.4.RELEASE",
   "org.springframework" % "spring-web" % "3.2.4.RELEASE",
-   "mysql" % "mysql-connector-java" % "5.1.18"
+   "mysql" % "mysql-connector-java" % "5.1.18",
+  "org.mongodb" % "mongo-java-driver" % "2.12.4",
+  "org.jongo" % "jongo" % "1.1"
 )
 
 play.Project.playJavaSettings

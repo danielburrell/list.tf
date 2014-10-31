@@ -1,9 +1,9 @@
 
 package uk.co.solong.tf2.schema;
 
-import java.util.List;
 
 public class Schema{
+    private Long schemaVersion;
    	private Result result;
 
  	public Result getResult(){
@@ -12,4 +12,10 @@ public class Schema{
 	public void setResult(Result result){
 		this.result = result;
 	}
+    public Long getSchemaVersion() {
+        return schemaVersion;
+    }
+    public void setSchemaVersion(Long schemaVersion) {
+        this.schemaVersion = schemaVersion;
+    }
 }

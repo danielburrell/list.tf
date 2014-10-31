@@ -2,39 +2,34 @@ package models;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import org.bson.types.ObjectId;
 
-import play.db.ebean.Model;
 
-@Entity
-@Table
-public class Item extends Model {
+public class Item {
 
-    private static final long serialVersionUID = 1L;
     // [{"itemId":"768","details":[{"detailId":"789017293","quality":"1","level":"5","tradable":"1","craftable":"1","craftnumber":"0","giftwrapped":"0","price":"3-5keys"}]}];
 
-    @Id
-    public Long wantedId;
+    // id associated with any changes to this item
 
+    
+    public String wantedId;
+
+    // state (.e.g wanted, unwanted etc)
     public int state;
 
-    /*@ManyToOne(targetEntity=SteamUser.class)
-    public long steamId;*/
-
+    // the steam defindex of the item that's wanted
     public Long itemId;
 
+    // the friendly name of the item
     public String name;
 
+    // the image associated with the item
     public String image;
 
-    @OneToMany(cascade=CascadeType.ALL)
+    // the list of detailed specifications for the item
+
     public List<Detail> details;
 
+    // effective priority of the item (i.e. max([details.priority]))
     public int effectivePriority;
 }
