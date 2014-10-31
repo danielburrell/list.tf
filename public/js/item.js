@@ -257,9 +257,9 @@ app.directive('wantedItem', function() {
           });
       }
 
-      $scope.markDetailAs = function(detailId, isObtained) {
+      $scope.markDetailAs = function(wantedId, detailId, isObtained) {
         console.log(isObtained);
-        url = '/api/markDetailAs/' + detailId + '/' + isObtained;
+        url = '/api/markDetailAs/' + wantedId + '/' + detailId + '/' + isObtained;
         $http.post(url).success(function(data) {
           $scope.pushMarkAsToModel(detailId, isObtained);
         }).error(function(data, status, headers, config) {

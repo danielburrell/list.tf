@@ -23,8 +23,8 @@ GET     /api/getWantedList/:steamId                           controllers.Applic
 POST     /api/addDetail                        controllers.Application.addDetail()
 POST     /api/editDetail/detailId/:detailId                           controllers.Application.editDetail(detailId: Long)
 POST     /api/deleteDetail/:detailId                           controllers.Application.deleteDetail(detailId: Long)
-POST     /api/markAs/:detailId/:state                           controllers.Application.markAs(detailId: Long, state: Long)
-POST     /api/markDetailAs/:detailId/:isObtained                           controllers.Application.markDetailAs(detailId: Long, isObtained: Boolean)
+POST     /api/markAs/:wantedId/:state                           controllers.Application.markAs(wantedId: String, state: Long)
+POST     /api/markDetailAs/:wantedId/:detailId/:isObtained                           controllers.Application.markDetailAs(wantedId: String, detailId: String, isObtained: Boolean)
 
 
 GET     /loginStatus                         controllers.Application.loginStatus()

@@ -113,8 +113,8 @@
             </button>
             <ul class="dropdown-menu" role="menu">
               <li><a href="javascript:;" ng-click="edit(detail.detailId)"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
-              <li><a ng-show="detail.isObtained == false" href="javascript:;" ng-click="markDetailAs(detail.detailId, true)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a>
-              <a ng-show="detail.isObtained == true" href="javascript:;" ng-click="markDetailAs(detail.detailId, false)"><span class="glyphicon glyphicon-ok"></span> Mark as Unobtained</a>
+              <li><a ng-show="detail.isObtained == false" href="javascript:;" ng-click="markDetailAs(item.wantedId,detail.detailId, true)"><span class="glyphicon glyphicon-ok"></span> Mark as obtained</a>
+              <a ng-show="detail.isObtained == true" href="javascript:;" ng-click="markDetailAs(item.wantedId,detail.detailId, false)"><span class="glyphicon glyphicon-ok"></span> Mark as Unobtained</a>
               </li>
               <li class="divider"></li>
               <li ng-class="{true:'disabled'}[detail.priority == 3]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 3)"><span
