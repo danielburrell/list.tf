@@ -33,9 +33,11 @@ import play.Play;
 import play.libs.F.Function;
 import play.libs.F.Promise;
 import play.libs.Json;
-import play.libs.OpenID;
-import play.libs.OpenID.UserInfo;
-import play.libs.WS;
+import play.libs.openid.OpenID;
+import play.libs.openid.OpenID.UserInfo;
+
+import play.libs.ws.WS;
+import play.libs.ws.WSResponse;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -279,8 +281,8 @@ public class Application extends Controller {
         Long steamId = Long.parseLong(session("steamId"));
 
         Promise<Result> p = WS.url(getPlayerItems).setQueryParameter("key", steamApiKey).setQueryParameter("steamId", steamId.toString()).get()
-                .map(new Function<WS.Response, Result>() {
-                    public Result apply(WS.Response response) {
+                .map(new Function<WSResponse, Result>() {
+                    public Result apply(WSResponse response) {
                         try {
                             Long steamId = Long.parseLong(session("steamId"));
                             String node = response.getBody();

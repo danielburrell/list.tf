@@ -18,7 +18,9 @@ import play.Logger;
 import play.Play;
 import play.libs.Akka;
 import play.libs.F.Function;
-import play.libs.WS;
+
+import play.libs.ws.WS;
+import play.libs.ws.WSResponse;
 import scala.concurrent.duration.Duration;
 import uk.co.solong.tf2.schema.Items;
 import uk.co.solong.tf2.schema.Result;
@@ -66,9 +68,9 @@ public class Global extends GlobalSettings {
         new Runnable() {
 
             public void run() {
-                WS.url(schemaUrl).setQueryParameter("key", schemaKey).setQueryParameter("language", language).get().map(new Function<WS.Response, Result>() {
+                WS.url(schemaUrl).setQueryParameter("key", schemaKey).setQueryParameter("language", language).get().map(new Function<WSResponse, Result>() {
 
-                    public Result apply(WS.Response response) {
+                    public Result apply(WSResponse response) {
                         try {
                             Logger.info("Fetching schema data");
                             InputStream input = response.getBodyAsStream();
