@@ -2,6 +2,18 @@ name := "wanted"
 
 version := "1.0-SNAPSHOT"
 
+maintainer := "Daniel Burrell <daniel.burrell@gmail.com>"
+
+packageDescription := "Package description"
+
+debianPackageDependencies in Debian ++= Seq("java2-runtime")
+
+debianPackageRecommends in Debian += "git"
+
+lazy val root = (project in file(".")).enablePlugins(PlayJava).enablePlugins(JDebPackaging)
+
+scalaVersion := "2.11.1"
+
 libraryDependencies ++= Seq(
   javaJdbc,
   javaEbean,
@@ -15,17 +27,3 @@ libraryDependencies ++= Seq(
   "org.mongodb" % "mongo-java-driver" % "2.12.4",
   "org.jongo" % "jongo" % "1.1"
 )
-
-play.Project.playJavaSettings
-
-mappings in Universal += {
-  file("schema/base/create_database.sql") -> "schema/base/create_database.sql"
-}
-
-mappings in Universal += {
-  file("reference/historic.json") -> "reference/historic.json"
-}
-
-mappings in Universal += {
-  file("schema/patch/grant_permissions.sql") -> "schema/patch/grant_permissions.sql"
-}
