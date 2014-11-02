@@ -117,17 +117,17 @@
               <a ng-show="detail.isObtained == true" href="javascript:;" ng-click="markDetailAs(item.wantedId,detail.detailId, false)"><span class="glyphicon glyphicon-ok"></span> Mark as Unobtained</a>
               </li>
               <li class="divider"></li>
-              <li ng-class="{true:'disabled'}[detail.priority == 3]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 3)"><span
+              <li ng-class="{true:'disabled'}[detail.priority == 3]"><a href="javascript:;" ng-click="setPriority(item.wantedId, detail.detailId, 3)"><span
                   class="glyphicon glyphicon-exclamation-sign"></span> Critical Priority</a></li>
-              <li ng-class="{true: 'disabled'}[detail.priority == 2]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 2)"><span
+              <li ng-class="{true: 'disabled'}[detail.priority == 2]"><a href="javascript:;" ng-click="setPriority(item.wantedId, detail.detailId, 2)"><span
                   class="glyphicon glyphicon-arrow-up"></span> High Priority</a></li>
-              <li ng-class="{true:'disabled'}[detail.priority == 1]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 1)"><span
+              <li ng-class="{true:'disabled'}[detail.priority == 1]"><a href="javascript:;" ng-click="setPriority(item.wantedId, detail.detailId, 1)"><span
                   class="glyphicon glyphicon-arrow-up"></span> Medium Priority</a></li>
-              <li ng-class="{true:'disabled'}[detail.priority == 0]"><a href="javascript:;" ng-click="setPriority(detail.detailId, 0)"><span
+              <li ng-class="{true:'disabled'}[detail.priority == 0]"><a href="javascript:;" ng-click="setPriority(item.wantedId, detail.detailId, 0)"><span
                   class="glyphicon glyphicon-arrow-down"></span> Low Priority</a></li>
               <li class="divider"></li>
 
-              <li ng-click="showDeleteDetail(detail.detailId)" data-toggle="modal" data-target="#delete"><a href="javascript:;"><span
+              <li ng-click="showDeleteDetail(item.wantedId, detail.detailId)" data-toggle="modal" data-target="#delete"><a href="javascript:;"><span
                   class="glyphicon glyphicon-remove"></span> Delete</a></li>
 
 
@@ -165,7 +165,7 @@
     </table>
   </div>
   <div wanted-dialog proposed-detail="proposedDetail" push-detail-function="pushDetailToModel(wantedId, details)"></div>
-  <div wanted-delete proposed-detail-delete="proposedDetailDelete" remove-detail-function="removeDetailFromModel(detailId)"></div>
+  <div wanted-delete proposed-wanted-delete="proposedWantedDelete" proposed-detail-delete="proposedDetailDelete" remove-detail-function="removeDetailFromModel(wantedId, detailId)"></div>
   <ul class="pager">
     <li ng-class="{true:'previous disabled', false:'previous'}[currentPage == 0]"><a href="javascript:;" ng-click="previous(currentPage)">&larr;
         Previous</a></li>

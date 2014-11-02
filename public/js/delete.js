@@ -1,42 +1,50 @@
 var app = angular.module('wantedDelete', []);
 
 app.directive('wantedDelete', function() {
-  return {
+	return {
 
-    restrict : 'A',
+		restrict : 'A',
 
-    scope : {
-      removeDetailFunction : '&',
-      proposedDetailDelete : '='
-    },
+		scope : {
+			removeDetailFunction : '&',
+			proposedDetailDelete : '=',
+			proposedWantedDelete : '='
+		},
 
-    templateUrl : '/assets/templates/delete.html',
-    controller : [ '$scope', '$http', function($scope, $http) {
+		templateUrl : '/assets/templates/delete.html',
+		controller : [
+				'$scope',
+				'$http',
+				function($scope, $http) {
 
-      $scope.deleteDetail = function() {
-        detailId = $scope.proposedDetailDelete;
-        url = '/api/deleteDetail/' + $scope.proposedDetailDelete;
-        $http.post(url).success(function(data) {
-          console.log(data);
-          $scope.removeDetailFunction({
-            detailId : detailId
-          });
-          $('#delete').modal('hide');
-        }).error(function(data, status, headers, config) {
-          $scope.proposalState = "failed";
-        });
-      }
+					$scope.deleteDetail = function() {
+						detailId = $scope.proposedDetailDelete;
+						wantedId = $scope.proposedWantedDelete;
+						url = '/api/deleteDetail/'
+								+ $scope.proposedWantedDelete + '/'
+								+ $scope.proposedDetailDelete;
+						$http.post(url).success(function(data) {
+							console.log(data);
+							$scope.removeDetailFunction({
+								wantedId : wantedId,
+								detailId : detailId
+							});
+							$('#delete').modal('hide');
+						}).error(function(data, status, headers, config) {
+							$scope.proposalState = "failed";
+						});
+					}
 
-      $scope.proposalState = "incomplete";
+					$scope.proposalState = "incomplete";
 
-      $scope.acceptScope = function(scope) {
-        $scope.proposedDetail = scope.proposedDetail;
-        console.log($scope);
-      }
+					$scope.acceptScope = function(scope) {
+						$scope.proposedDetail = scope.proposedDetail;
+						console.log($scope);
+					}
 
-    } ],
-    link : function(scope, iElement, iAttrs) {
-    },
+				} ],
+		link : function(scope, iElement, iAttrs) {
+		},
 
-  }
+	}
 });

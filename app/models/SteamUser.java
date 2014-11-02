@@ -2,9 +2,12 @@ package models;
 
 import java.util.List;
 
+import org.jongo.marshall.jackson.oid.Id;
+
 public class SteamUser {
 
     // Id representing the user
+    @Id
     public Long steamId;
 
     // version of the schema that this user is currently running on

@@ -64,7 +64,7 @@ app.directive('wantedItem', function() {
         }
       };
 
-      $scope.removeDetailFromModel = function(detailId) {
+      $scope.removeDetailFromModel = function(wantedId, detailId) {
         for ( var i = 0; i < $scope.items.length; i++) {
           for ( var j = 0; j < $scope.items[i].details.length; j++) {
             if ($scope.items[i].details[j].detailId == detailId) {
@@ -135,8 +135,10 @@ app.directive('wantedItem', function() {
         $scope.proposedDetail.wantedId = wantedId;
       };
 
-      $scope.showDeleteDetail = function(detailId) {
+      $scope.showDeleteDetail = function(wantedId, detailId) {
+    	  console.log(wantedId+detailId);
         $scope.proposedDetailDelete = detailId;
+        $scope.proposedWantedDelete = wantedId;
       };
 
       $scope.qualities = [ {
@@ -246,8 +248,8 @@ app.directive('wantedItem', function() {
         });
       }
 
-      $scope.setPriority = function(detailId, priority) {
-          url = '/api/priority/' + detailId + '/' + priority;
+      $scope.setPriority = function(wantedId, detailId, priority) {
+          url = '/api/priority/' + wantedId + '/' + detailId + '/' + priority;
           $http.post(url).success(function(data) {
             $scope.pushPriorityToModel(detailId, priority);
           }).error(function(data, status, headers, config) {

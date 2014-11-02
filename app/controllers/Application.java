@@ -3,6 +3,12 @@ package controllers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +39,9 @@ import play.libs.WS;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import uk.co.solong.tf2.playeritems.Attributes;
+import uk.co.solong.tf2.playeritems.Backpack;
+import uk.co.solong.tf2.playeritems.Items;
 import uk.co.solong.tf2.playersummaries.PlayerSummaryResult;
 import uk.co.solong.tf2.schema.Schema;
 import views.html.index;
@@ -40,6 +49,7 @@ import views.html.index;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
@@ -149,11 +159,17 @@ public class Application extends Controller {
         Long steamId = Long.parseLong(session("steamId"));
         // List<Item> items = getPlayerItemDocumentFromMongo(steamId).item;
 
-        for (String item : map.keySet()) {
-            // for each blacklistable item, blacklist it
-            userCollection.update("{steamId:#} and {item.itemId:#}", steamId, item).with("{$set:{item.state:0}}");
+        SteamUser s = getPlayerItemDocumentFromMongo(steamId);
 
+        for (Item wantedItem : s.item) {
+            for (String blackList : map.keySet()) {
+                // for each blacklistable item, blacklist it
+                if (wantedItem.itemId.toString().equals(blackList))
+                    wantedItem.state = 0;
+            }
         }
+        WriteResult u = userCollection.save(s);
+
         ObjectNode result = Json.newObject();
         result.put("success", "Historic items marked");
         return ok(result);
@@ -163,7 +179,7 @@ public class Application extends Controller {
         Promise<UserInfo> d = OpenID.verifiedId();
 
         return d.map(new Function<UserInfo, Result>() {
-            public Result apply(UserInfo userInfo) {
+            public Result apply(UserInfo userInfo) throws MalformedURLException, IOException {
                 Long steamId = getSteamIdFromResponseUrl(userInfo.id);
                 if (steamId > 0) {
                     // perform login tasks
@@ -201,11 +217,13 @@ public class Application extends Controller {
              * @return 0 if the user is new
              * @return 1 if the user is not new, but there are new items
              * @return 2 if the user is not new and there are no new items
+             * @throws IOException
+             * @throws MalformedURLException
              */
-            public int getUserWelcomeStatus(Long steamId) {
+            public int getUserWelcomeStatus(Long steamId) throws MalformedURLException, IOException {
                 // TODO Auto-generated method stub
                 Logger.info("Checking welcome status");
-                SteamUser user = userCollection.findOne("{steamId:#}", steamId).as(SteamUser.class);
+                SteamUser user = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
                 if (user == null) {
                     // TODO: create user
                     createNewUser(steamId);
@@ -221,13 +239,12 @@ public class Application extends Controller {
                 }
             }
 
-            private void createNewUser(Long steamId) {
+            private void createNewUser(Long steamId) throws MalformedURLException, IOException {
                 // TODO Auto-generated method stub
                 Schema c = schemaCollection.findOne("").orderBy("{schemaVersion:-1}").as(Schema.class);
                 List<uk.co.solong.tf2.schema.Items> items = c.getResult().getItems();
-                SteamUser user = new SteamUser();
+                SteamUser user = getNameFromSteam(steamId);
                 user.steamId = steamId;
-                user.name = "Mr Pink";
                 user.item = new ArrayList<Item>();
                 user.schemaId = c.getSchemaVersion();
 
@@ -258,195 +275,249 @@ public class Application extends Controller {
     }
 
     public static Promise<Result> sync() {
-        /*
-         * Long steamId = Long.parseLong(session("steamId"));
-         * 
-         * Promise<Result> p = WS.url(getPlayerItems).setQueryParameter("key",
-         * steamApiKey).setQueryParameter("steamId", steamId.toString()).get()
-         * .map(new Function<WS.Response, Result>() { public Result
-         * apply(WS.Response response) { try { Long steamId =
-         * Long.parseLong(session("steamId")); String node = response.getBody();
-         * ObjectMapper om = new ObjectMapper(); Backpack backpack =
-         * om.readValue(node, Backpack.class); if (new
-         * Integer(1).equals(backpack.getResult().getStatus())) { List<Items>
-         * items = backpack.getResult().getItems(); SteamUser s =
-         * getItemsForPlayer(steamId); for (Items backpackItem : items) { if
-         * (!isBackPackItemInWantedList(backpackItem, s.item)) {
-         * importSingleDetail(backpackItem); } } s = getItemsForPlayer(steamId);
-         * for (Item wantedItem : s.item) { boolean areAllDetailsObtained =
-         * areAllDetailsObtained(wantedItem.details); if (areAllDetailsObtained)
-         * { applyCompleteStateToItem(wantedItem); } } ObjectNode result =
-         * Json.newObject(); result.put("success", "Backpack synced"); return
-         * ok(result); } else { ObjectNode result = Json.newObject();
-         * result.put("error", "not public profile"); return ok(result); }
-         * 
-         * } catch (Exception e) { ObjectNode result = Json.newObject();
-         * result.put("error", "steamDown"); return ok(result); } }
-         * 
-         * private void applyCompleteStateToItem(Item wantedItem) { // TODO
-         * Auto-generated method stub long rowCount =
-         * setItemState(wantedItem.wantedId, 3L);
-         * Logger.info("Closed item group"); }
-         * 
-         * private boolean areAllDetailsObtained(List<Detail> details) { // TODO
-         * Auto-generated method stub if (details == null || details.size() ==
-         * 0) return false; boolean areAllDetailsObtained = true; for (Detail
-         * detail : details) { areAllDetailsObtained &= detail.isObtained; }
-         * return areAllDetailsObtained; }
-         * 
-         * private void importSingleDetail(Items backpackItem) { // TODO add
-         * detail to table long steamId = Long.parseLong(session("steamId"));
-         * Object[] params = new Object[] { steamId, backpackItem.getDefindex(),
-         * backpackItem.getQuality(), backpackItem.getLevel(),
-         * !backpackItem.getFlag_cannot_trade(),
-         * !backpackItem.getFlag_cannot_craft(), getCraftNumber(backpackItem),
-         * isGiftWrapped(backpackItem), true }; JdbcTemplate jdbcTemplate = new
-         * JdbcTemplate(DB.getDataSource()); SimpleJdbcCall call = new
-         * SimpleJdbcCall
-         * (jdbcTemplate).withSchemaName("wanted").withProcedureName
-         * ("addDetailFromItemId"); Logger.info("Executed"); Map<String, Object>
-         * result = call.execute(params); Logger.info("Results: {}",
-         * Json.toJson(result)); Logger.info("Imported Single Item");
-         * 
-         * }
-         * 
-         * /** Returns true if the item in the users backpack is listed within
-         * their wanted items.
-         * 
-         * @param backpackItem
-         * 
-         * @param wantedItemsWithDetails
-         * 
-         * @return
-         *//*
-            * private boolean isBackPackItemInWantedList(Items backpackItem,
-            * List<Item> wantedItemsWithDetails) { for (Item
-            * wantedItemWithDetails : wantedItemsWithDetails) { if
-            * (wantedItemWithDetails.itemId.equals(backpackItem.getDefindex()))
-            * { return (isSubsetOfDetails(backpackItem, wantedItemWithDetails));
-            * } } return false; }
-            * 
-            * /** Returns true if the the given item, exactly or by subset,
-            * matches the given details If true, then the detail is marked as
-            * complete, and true returned, otherwise false is returned.
-            * 
-            * @param wantedItem
-            * 
-            * @param backpackItem
-            * 
-            * @return
-            *//*
-               * private boolean isSubsetOfDetails(Items backpackItem, Item
-               * wantedItem) { for (Detail detail : wantedItem.details) { if
-               * (isSubsetOfDetail(backpackItem, detail)) {
-               * markDetailAsObtained(detail); return true; } } return false; }
-               * 
-               * /** Returns true if the the given item, exactly or by subset,
-               * matches the given detail. If true, then the detail is marked as
-               * complete, and true returned, otherwise false is returned.
-               * 
-               * @param backpackItem
-               * 
-               * @param detail
-               * 
-               * @return
-               *//*
-                  * private boolean isSubsetOfDetail(Items backpackItem, Detail
-                  * detail) { return checkQualitySubset(detail, backpackItem) &&
-                  * checkLevelSubset(detail, backpackItem) &&
-                  * checkTradableSubset(detail, backpackItem) &&
-                  * checkCraftableSubset(detail, backpackItem) &&
-                  * checkCraftNumberSubset(detail, backpackItem) &&
-                  * checkGiftWrappedSubset(detail, backpackItem); }
-                  * 
-                  * private void markDetailAsObtained(Detail detail) { // TODO
-                  * extract the detailid, isObtained to true long detailId =
-                  * detail.detailId; long steamId =
-                  * Long.parseLong(session("steamId")); Object[] params = new
-                  * Object[] { steamId, detailId }; JdbcTemplate jdbcTemplate =
-                  * new JdbcTemplate(DB.getDataSource()); SimpleJdbcCall call =
-                  * new SimpleJdbcCall(jdbcTemplate).withSchemaName("wanted").
-                  * withProcedureName("markDetailAsObtained");
-                  * Logger.info("Executed"); Map<String, Object> result =
-                  * call.execute(params); Logger.info("Results: {}",
-                  * Json.toJson(result)); }
-                  * 
-                  * private boolean checkGiftWrappedSubset(Detail detail, Items
-                  * backpackItem) { boolean isGiftWrapped =
-                  * isGiftWrapped(backpackItem); boolean equalYes =
-                  * (isGiftWrapped && new
-                  * Integer(1).equals(detail.isGiftWrapped)); boolean equalNo =
-                  * (!isGiftWrapped && new
-                  * Integer(0).equals(detail.isGiftWrapped)); boolean equalAny =
-                  * (new Integer(-1).equals(detail.isGiftWrapped)); return
-                  * (equalYes || equalNo || equalAny); }
-                  * 
-                  * private boolean isGiftWrapped(Items backpackItem) { if
-                  * (backpackItem.getAttributes() != null) { for (Attributes
-                  * attribute : backpackItem.getAttributes()) { if (new
-                  * Integer(186).equals(attribute.getDefindex())) { return true;
-                  * } } } return false; }
-                  * 
-                  * private boolean checkCraftNumberSubset(Detail detail, Items
-                  * backpackItem) { Number craftNumber =
-                  * getCraftNumber(backpackItem); boolean equalYes =
-                  * (craftNumber.equals(detail.quality)); boolean equalAny =
-                  * (new Integer(-1).equals(detail.quality)); return (equalYes
-                  * || equalAny); }
-                  * 
-                  * private Number getCraftNumber(Items backpackItem) { Number
-                  * craftNumber = 0; if (backpackItem.getAttributes() != null) {
-                  * for (Attributes attribute : backpackItem.getAttributes()) {
-                  * if (new Integer(229).equals(attribute.getDefindex())) {
-                  * craftNumber = Long.parseLong(attribute.getValue()); } } }
-                  * return craftNumber; }
-                  * 
-                  * private boolean checkCraftableSubset(Detail detail, Items
-                  * backpackItem) { boolean isCraftable =
-                  * !backpackItem.getFlag_cannot_craft(); boolean equalYes =
-                  * (isCraftable && new Integer(1).equals(detail.isCraftable));
-                  * boolean equalNo = (!isCraftable && new
-                  * Integer(0).equals(detail.isCraftable)); boolean equalAny =
-                  * (new Integer(-1).equals(detail.isCraftable)); return
-                  * (equalYes || equalNo || equalAny); }
-                  * 
-                  * private boolean checkTradableSubset(Detail detail, Items
-                  * backpackItem) { // TODO Auto-generated method stub boolean
-                  * isTradable = !backpackItem.getFlag_cannot_trade(); boolean
-                  * equalYes = (isTradable && new
-                  * Integer(1).equals(detail.isCraftable)); boolean equalNo =
-                  * (!isTradable && new Integer(0).equals(detail.isCraftable));
-                  * boolean equalAny = (new
-                  * Integer(-1).equals(detail.isCraftable)); return (equalYes ||
-                  * equalNo || equalAny); }
-                  * 
-                  * private boolean checkLevelSubset(Detail detail, Items
-                  * backpackItem) { // TODO Auto-generated method stub Number
-                  * level = backpackItem.getLevel(); boolean equalYes =
-                  * (level.equals(detail.levelNumber)); boolean equalAny = (new
-                  * Integer(-1).equals(detail.levelNumber)); return (equalYes ||
-                  * equalAny); }
-                  * 
-                  * private boolean checkQualitySubset(Detail detail, Items
-                  * backpackItem) { // TODO Auto-generated method stub Number
-                  * quality = backpackItem.getLevel(); boolean equalYes =
-                  * (quality.equals(detail.quality)); boolean equalAny = (new
-                  * Integer(-1).equals(detail.quality)); return (equalYes ||
-                  * equalAny); } }); return p;
-                  * 
-                  * // fetch items from backpack // error if not public
-                  * 
-                  * // otherwise, get all wanted items, // for each item in
-                  * backpack, call the shouldAdd() function passing in // the
-                  * wanted list. // if it returns true, then call the
-                  * importSingleItem passing in the // item
-                  */
-        Logger.error("We don't do this functionality");
-        return null;
+
+        Long steamId = Long.parseLong(session("steamId"));
+
+        Promise<Result> p = WS.url(getPlayerItems).setQueryParameter("key", steamApiKey).setQueryParameter("steamId", steamId.toString()).get()
+                .map(new Function<WS.Response, Result>() {
+                    public Result apply(WS.Response response) {
+                        try {
+                            Long steamId = Long.parseLong(session("steamId"));
+                            String node = response.getBody();
+                            ObjectMapper om = new ObjectMapper();
+                            Backpack backpack = om.readValue(node, Backpack.class);
+                            if (new Integer(1).equals(backpack.getResult().getStatus())) {
+                                List<Items> items = backpack.getResult().getItems();
+                                SteamUser s = getPlayerItemDocumentFromMongo(steamId);
+                                for (Items backpackItem : items) {
+                                    if (!isBackPackItemInWantedList(backpackItem, s.item)) {
+
+                                        addDetailToWantedList(s.item, backpackItem);
+                                    }
+                                }
+
+                                for (Item wantedItem : s.item) {
+                                    boolean areAllDetailsObtained = areAllDetailsObtained(wantedItem.details);
+                                    if (areAllDetailsObtained) {
+                                        applyCompleteStateToItem(wantedItem);
+                                    }
+                                }
+
+                                // Logger.info("Model generation complete {}",Json.toJson(s));
+
+                                WriteResult u = userCollection.save(s);
+                                Logger.info("Write complete");
+                                ObjectNode result = Json.newObject();
+                                result.put("success", "Backpack synced");
+                                return ok(result);
+                            } else {
+                                ObjectNode result = Json.newObject();
+                                result.put("error", "not public profile");
+                                return ok(result);
+                            }
+
+                        } catch (Exception e) {
+                            ObjectNode result = Json.newObject();
+                            result.put("error", "steamDown");
+                            return ok(result);
+                        }
+                    }
+
+                    private void applyCompleteStateToItem(Item wantedItem) { // TODO
+                        wantedItem.state = 3;
+                        Logger.info("Closed item group");
+                    }
+
+                    private boolean areAllDetailsObtained(List<Detail> details) { // TODO
+                        if (details == null || details.size() == 0)
+                            return false;
+                        boolean areAllDetailsObtained = true;
+                        for (Detail detail : details) {
+                            areAllDetailsObtained &= detail.isObtained;
+                        }
+                        return areAllDetailsObtained;
+                    }
+
+                    private void addDetailToWantedList(List<Item> wantedItems, Items backpackItem) {
+
+                        for (Item wantedItem : wantedItems) {
+                            if (wantedItem.itemId.equals(backpackItem.getDefindex().longValue())) {
+                                Logger.info("Comparison {} {} ", wantedItem.itemId, backpackItem.getDefindex());
+
+                                Detail detail = new Detail();
+                                detail.quality = backpackItem.getQuality().intValue();
+                                detail.levelNumber = backpackItem.getLevel().intValue();
+                                detail.isTradable = !backpackItem.getFlag_cannot_trade() ? 1 : 0;
+                                detail.isCraftable = !backpackItem.getFlag_cannot_craft() ? 1 : 0;
+                                detail.craftNumber = getCraftNumber(backpackItem).longValue();
+                                detail.isGiftWrapped = isGiftWrapped(backpackItem) ? 1 : 0;
+                                detail.isObtained = true;
+                                wantedItem.details.add(detail);
+
+                                Logger.info("Really imported Single Item");
+                                break;
+                            }
+                        }
+                        Logger.info("Imported Single Item");
+
+                    }
+
+                    /**
+                     * Returns true if the item in the users backpack is listed
+                     * within their wanted items.
+                     * 
+                     * @param backpackItem
+                     * 
+                     * @param wantedItemsWithDetails
+                     * 
+                     * @return
+                     */
+                    private boolean isBackPackItemInWantedList(Items backpackItem, List<Item> wantedItemsWithDetails) {
+                        for (Item wantedItemWithDetails : wantedItemsWithDetails) {
+                            if (wantedItemWithDetails.itemId.equals(backpackItem.getDefindex())) {
+                                return (isSubsetOfDetails(backpackItem, wantedItemWithDetails));
+                            }
+                        }
+                        return false;
+                    }
+
+                    /**
+                     * Returns true if the the given item, exactly or by subset,
+                     * matches the given details If true, then the detail is
+                     * marked as complete, and true returned, otherwise false is
+                     * returned.
+                     * 
+                     * @param wantedItem
+                     * 
+                     * @param backpackItem
+                     * 
+                     * @return
+                     */
+                    private boolean isSubsetOfDetails(Items backpackItem, Item wantedItem) {
+                        for (Detail detail : wantedItem.details) {
+                            if (isSubsetOfDetail(backpackItem, detail)) {
+                                markDetailAsObtained(detail);
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+
+                    /**
+                     * Returns true if the the given item, exactly or by subset,
+                     * matches the given detail. If true, then the detail is
+                     * marked as complete, and true returned, otherwise false is
+                     * returned.
+                     * 
+                     * @param backpackItem
+                     * 
+                     * @param detail
+                     * 
+                     * @return
+                     */
+                    private boolean isSubsetOfDetail(Items backpackItem, Detail detail) {
+                        return checkQualitySubset(detail, backpackItem) && checkLevelSubset(detail, backpackItem) && checkTradableSubset(detail, backpackItem)
+                                && checkCraftableSubset(detail, backpackItem) && checkCraftNumberSubset(detail, backpackItem)
+                                && checkGiftWrappedSubset(detail, backpackItem);
+                    }
+
+                    private void markDetailAsObtained(Detail detail) {
+                        // TODO extract the detailid, isObtained to true
+                        detail.isObtained = true;
+                    }
+
+                    private boolean checkGiftWrappedSubset(Detail detail, Items backpackItem) {
+                        boolean isGiftWrapped = isGiftWrapped(backpackItem);
+                        boolean equalYes = (isGiftWrapped && new Integer(1).equals(detail.isGiftWrapped));
+                        boolean equalNo = (!isGiftWrapped && new Integer(0).equals(detail.isGiftWrapped));
+                        boolean equalAny = (new Integer(-1).equals(detail.isGiftWrapped));
+                        return (equalYes || equalNo || equalAny);
+                    }
+
+                    private boolean isGiftWrapped(Items backpackItem) {
+                        if (backpackItem.getAttributes() != null) {
+                            for (Attributes attribute : backpackItem.getAttributes()) {
+                                if (new Integer(186).equals(attribute.getDefindex())) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    }
+
+                    private boolean checkCraftNumberSubset(Detail detail, Items backpackItem) {
+                        Number craftNumber = getCraftNumber(backpackItem);
+                        boolean equalYes = (craftNumber.equals(detail.quality));
+                        boolean equalAny = (new Integer(-1).equals(detail.quality));
+                        return (equalYes || equalAny);
+                    }
+
+                    private Number getCraftNumber(Items backpackItem) {
+                        Number craftNumber = 0;
+                        if (backpackItem.getAttributes() != null) {
+                            for (Attributes attribute : backpackItem.getAttributes()) {
+                                if (new Integer(229).equals(attribute.getDefindex())) {
+                                    craftNumber = Long.parseLong(attribute.getValue());
+                                }
+                            }
+                        }
+                        return craftNumber;
+                    }
+
+                    private boolean checkCraftableSubset(Detail detail, Items backpackItem) {
+                        boolean isCraftable = !backpackItem.getFlag_cannot_craft();
+                        boolean equalYes = (isCraftable && new Integer(1).equals(detail.isCraftable));
+                        boolean equalNo = (!isCraftable && new Integer(0).equals(detail.isCraftable));
+                        boolean equalAny = (new Integer(-1).equals(detail.isCraftable));
+                        return (equalYes || equalNo || equalAny);
+                    }
+
+                    private boolean checkTradableSubset(Detail detail, Items backpackItem) { // TODO
+                                                                                             // Auto-generated
+                                                                                             // method
+                                                                                             // stub
+                        boolean isTradable = !backpackItem.getFlag_cannot_trade();
+                        boolean equalYes = (isTradable && new Integer(1).equals(detail.isCraftable));
+                        boolean equalNo = (!isTradable && new Integer(0).equals(detail.isCraftable));
+                        boolean equalAny = (new Integer(-1).equals(detail.isCraftable));
+                        return (equalYes || equalNo || equalAny);
+                    }
+
+                    private boolean checkLevelSubset(Detail detail, Items backpackItem) { // TODO
+                                                                                          // Auto-generated
+                                                                                          // method
+                                                                                          // stub
+                                                                                          //
+                        Number level = backpackItem.getLevel();
+                        boolean equalYes = (level.equals(detail.levelNumber));
+                        boolean equalAny = (new Integer(-1).equals(detail.levelNumber));
+                        return (equalYes || equalAny);
+                    }
+
+                    private boolean checkQualitySubset(Detail detail, Items backpackItem) { // TODO
+                                                                                            // Auto-generated
+                                                                                            // method
+                                                                                            // stub
+                                                                                            //
+                        Number quality = backpackItem.getLevel();
+                        boolean equalYes = (quality.equals(detail.quality));
+                        boolean equalAny = (new Integer(-1).equals(detail.quality));
+                        return (equalYes || equalAny);
+                    }
+                });
+        return p;
+
+        // fetch items from backpack // error if not public
+
+        // otherwise, get all wanted items, // for each item in
+        // backpack, call the shouldAdd() function passing in // the
+        // wanted list. // if it returns true, then call the
+        // importSingleItem passing in the // item
+
     }
 
     public static Result getName(Long steamId) {
-        SteamUser c = userCollection.findOne("{steamId:#}", steamId).as(SteamUser.class);
+        SteamUser c = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
         if (c != null) {
             SteamUser user = new SteamUser();
             user.name = c.name;
@@ -458,27 +529,22 @@ public class Application extends Controller {
         }
     }
 
-    public static Promise<Result> getNameFromSteam(Long steamId) {
+    public static SteamUser getNameFromSteam(Long steamId) throws MalformedURLException, IOException {
         // TODO: move this into a 1 time when user signs up, signs in, and
         // refresh once per day efficiently
-        Promise<Result> p = WS.url(playerSummaryUrl).setQueryParameter("key", steamApiKey).setQueryParameter("steamIds", steamId.toString()).get()
-                .map(new Function<WS.Response, Result>() {
-                    public Result apply(WS.Response response) {
-                        try {
-                            String node = response.getBody();
-                            ObjectMapper om = new ObjectMapper();
-                            PlayerSummaryResult s = om.readValue(node, PlayerSummaryResult.class);
-                            SteamUser user = new SteamUser();
-                            user.name = s.getResponse().getPlayers().get(0).getPersonaname();
-                            user.avatar = s.getResponse().getPlayers().get(0).getAvatarmedium();
-                            JsonNode result = Json.toJson(user);
-                            return ok(result);
-                        } catch (Exception e) {
-                            return ok("name Unavailable");
-                        }
-                    }
-                });
-        return p;
+        String url = String
+                .format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamIds=%s", new Object[] { steamApiKey, steamId });
+        Logger.info(url);
+        InputStream input = new URL(url).openStream();
+        Reader streamReader = new InputStreamReader(input, "UTF-8");
+        ObjectMapper m = new ObjectMapper();
+        ObjectReader reader = m.reader(PlayerSummaryResult.class);
+        PlayerSummaryResult s = reader.readValue(streamReader);
+        streamReader.close();
+        SteamUser user = new SteamUser();
+        user.name = s.getResponse().getPlayers().get(0).getPersonaname();
+        user.avatar = s.getResponse().getPlayers().get(0).getAvatarmedium();
+        return user;
     }
 
     public static Result login() {
@@ -523,7 +589,7 @@ public class Application extends Controller {
     }
 
     private static SteamUser getPlayerItemDocumentFromMongo(Long steamId) {
-        SteamUser c = userCollection.findOne("{steamId:#}", steamId).as(SteamUser.class);
+        SteamUser c = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
         return c;
     }
 
@@ -541,8 +607,7 @@ public class Application extends Controller {
         if (validDetail) {
             Logger.info("Valid input");
             long steamId = Long.parseLong(session("steamId"));
-            WriteResult u = userCollection.update("{steamId:#, item.wantedId:#}", steamId, item.wantedId).with("{$push:{item.$.details:#}}",
-                    item.details.get(0));
+            WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, item.wantedId).with("{$push:{item.$.details:#}}", item.details.get(0));
             Logger.info("Add item");
 
             return ok(Json.toJson(item)); //
@@ -583,49 +648,64 @@ public class Application extends Controller {
         return TODO;
     }
 
-    public static Result deleteDetail(long detailId) {
+    public static Result deleteDetail(String wantedId, String detailId) {
         // require index on [detailId & steamId]
         // delete from wanted.details where detailId = x and steamId = session()
-        Logger.error("funcitonality missing");
-        return null;
-        /*
-         * long steamId = Long.parseLong(session("steamId")); Object[] params =
-         * new Object[] { steamId, detailId }; JdbcTemplate jdbcTemplate = new
-         * JdbcTemplate(DB.getDataSource()); SimpleJdbcCall call = new
-         * SimpleJdbcCall
-         * (jdbcTemplate).withSchemaName("wanted").withProcedureName
-         * ("deleteDetail"); Logger.info("Executed"); Map<String, Object> result
-         * = call.execute(params); Logger.info("Results: {}",
-         * Json.toJson(result)); long rowCount = (long)
-         * result.get("deleted_row_count"); if ((rowCount > 0)) { return
-         * ok(Json.newObject().put("rowCount", rowCount)); } else { DeleteError
-         * error = new DeleteError(); error.error = "Delete failed"; return
-         * badRequest(Json.toJson(error)); }
-         */
+
+        long steamId = Long.parseLong(session("steamId"));
+
+        SteamUser s = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
+        for (Item item : s.item) {
+            if (item.wantedId.equals(wantedId)) {
+                for (Detail detail : item.details) {
+                    if (detail.detailId.equals(detailId)) {
+                        item.details.remove(detail);
+                        WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.details:#}}", item.details);
+                        Logger.info("Results: {}", u.getN());
+                        return ok(Json.newObject().put("rowCount", u.getN()));
+                    }
+                }
+            }
+        }
+
+        DeleteError error = new DeleteError();
+        error.error = "Delete failed";
+        return badRequest(Json.toJson(error));
+
     }
 
-    public static Result setPriority(long detailId, int priority) {
+    public static Result setPriority(String wantedId, String detailId, int priority) {
         // require index on [detailId & steamId]
         // delete from wanted.details where detailId = x and steamId = session()
-        /*
-         * if (priority > 3 || priority < 0) { DeleteError error = new
-         * DeleteError(); error.error = "Delete failed"; return
-         * badRequest(Json.toJson(error)); } else { long steamId =
-         * Long.parseLong(session("steamId")); Object[] params = new Object[] {
-         * steamId, detailId, priority }; JdbcTemplate jdbcTemplate = new
-         * JdbcTemplate(DB.getDataSource()); SimpleJdbcCall call = new
-         * SimpleJdbcCall
-         * (jdbcTemplate).withSchemaName("wanted").withProcedureName
-         * ("setDetailPriority"); Logger.info("Executed"); Map<String, Object>
-         * result = call.execute(params); Logger.info("Results: {}",
-         * Json.toJson(result)); long rowCount = (long)
-         * result.get("updated_row_count"); if ((rowCount > 0)) { return
-         * ok(Json.newObject().put("rowCount", rowCount)); } else { DeleteError
-         * error = new DeleteError(); error.error = "Delete failed"; return
-         * badRequest(Json.toJson(error)); } }
-         */
-        Logger.error("funcitonality missing");
-        return null;
+
+        if (priority > 3 || priority < 0) {
+            DeleteError error = new DeleteError();
+            error.error = "Delete failed";
+            return badRequest(Json.toJson(error));
+        } else {
+
+            long steamId = Long.parseLong(session("steamId"));
+            SteamUser s = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
+            for (Item item : s.item) {
+                if (item.wantedId.equals(wantedId)) {
+                    for (Detail detail : item.details) {
+                        if (detail.detailId.equals(detailId)) {
+                            detail.priority = priority;
+                            WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, wantedId)
+                                    .with("{$set:{item.$.details:#}}", item.details);
+                            Logger.info("Results: {}", u.getN());
+                            return ok(Json.newObject().put("rowCount", u.getN()));
+                        }
+                    }
+                }
+            }
+
+            DeleteError error = new DeleteError();
+            error.error = "Delete failed";
+            return badRequest(Json.toJson(error));
+
+        }
+
     }
 
     public static Result priorityDown(long detailId) {
@@ -648,26 +728,28 @@ public class Application extends Controller {
         Logger.error("funcitonality missing");
         return null;
     }
-//TODO add wantedId, either: query for the wantedid contents, and update that content, or trust the client to send the contents
-    
+
+    // TODO add wantedId, either: query for the wantedid contents, and update
+    // that content, or trust the client to send the contents
+
     public static Result markDetailAs(String wantedId, String detailId, Boolean isObtained) {
         // TODO extract the detailid, isObtained to true
 
         long steamId = Long.parseLong(session("steamId"));
-        SteamUser s = userCollection.findOne("{steamId:#}", steamId).as(SteamUser.class);
+        SteamUser s = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
         for (Item item : s.item) {
-            if (item.wantedId.equals(wantedId)){
-                for (Detail detail:item.details){
-                    if (detail.detailId.equals(detailId)){
+            if (item.wantedId.equals(wantedId)) {
+                for (Detail detail : item.details) {
+                    if (detail.detailId.equals(detailId)) {
                         detail.isObtained = isObtained;
-                        WriteResult u = userCollection.update("{steamId:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.details:#}}", item.details);
-                        Logger.info("Results: {}",u.getN());
+                        WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.details:#}}", item.details);
+                        Logger.info("Results: {}", u.getN());
                         return ok(Json.newObject().put("rowCount", u.getN()));
                     }
                 }
             }
         }
-        
+
         return ok(Json.newObject().put("rowCount", 0));
     }
 
@@ -685,7 +767,7 @@ public class Application extends Controller {
 
     private static long setItemState(String wantedId, Long state) {
         long steamId = Long.parseLong(session("steamId"));
-        WriteResult u = userCollection.update("{steamId:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.state:#}}", state);
+        WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.state:#}}", state);
         Logger.info("Executed");
         long rowCount = u.getN();
         return rowCount;

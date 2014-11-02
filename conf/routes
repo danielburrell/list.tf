@@ -22,7 +22,7 @@ GET    /partial/list.html    controllers.Application.wantedPartial()
 GET     /api/getWantedList/:steamId                           controllers.Application.getWantedList(steamId: Long)
 POST     /api/addDetail                        controllers.Application.addDetail()
 POST     /api/editDetail/detailId/:detailId                           controllers.Application.editDetail(detailId: Long)
-POST     /api/deleteDetail/:detailId                           controllers.Application.deleteDetail(detailId: Long)
+POST     /api/deleteDetail/:wantedId/:detailId                           controllers.Application.deleteDetail(wantedId: String, detailId: String)
 POST     /api/markAs/:wantedId/:state                           controllers.Application.markAs(wantedId: String, state: Long)
 POST     /api/markDetailAs/:wantedId/:detailId/:isObtained                           controllers.Application.markDetailAs(wantedId: String, detailId: String, isObtained: Boolean)
 
@@ -35,7 +35,7 @@ GET     /api/logout                         controllers.Application.logout()
 GET     /api/openIDCallback                         controllers.Application.openIDCallbackAPI()
 GET     /api/sync                         controllers.Application.sync()
 GET     /api/markImpossibleHistoric                         controllers.Application.markImpossibleHistoric()
-POST     /api/priority/:detailId/:priority                           controllers.Application.setPriority(detailId: Long, priority: Integer)
+POST     /api/priority/:wantedId/:detailId/:priority                           controllers.Application.setPriority(wantedId: String, detailId: String, priority: Integer)
 
 
 # Map static resources from the /public folder to the /assets URL path
