@@ -73,6 +73,7 @@ public class Global extends GlobalSettings {
                     public Result apply(WSResponse response) {
                         try {
                             Logger.info("Fetching schema data");
+                            Logger.debug(response.getBody());
                             InputStream input = response.getBodyAsStream();
                             Reader streamReader = new InputStreamReader(input, "UTF-8");
                             ObjectMapper m = new ObjectMapper();
