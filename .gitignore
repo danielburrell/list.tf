@@ -16,3 +16,4 @@ dist
 /.target
 /.vagrant
 *.mwb.bak
+/bin/

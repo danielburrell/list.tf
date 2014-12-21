@@ -10,7 +10,7 @@ debianPackageDependencies in Debian ++= Seq("java2-runtime")
 
 debianPackageRecommends in Debian += "git"
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava).enablePlugins(JavaServerAppPackaging)
+lazy val root = (project in file(".")).enablePlugins(PlayJava).enablePlugins(JDebPackaging)
 
 scalaVersion := "2.11.1"
 

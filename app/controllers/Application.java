@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,6 @@ import models.ValidationFailure;
 import org.expressme.openid.Association;
 import org.expressme.openid.Endpoint;
 import org.expressme.openid.OpenIdManager;
-import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 
 import play.Logger;
@@ -35,7 +33,6 @@ import play.libs.F.Promise;
 import play.libs.Json;
 import play.libs.openid.OpenID;
 import play.libs.openid.OpenID.UserInfo;
-
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import play.mvc.BodyParser;
@@ -53,34 +50,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 
 public class Application extends Controller {
 
-    private static Jongo jongo;
-    private static MongoCollection userCollection;
-    private static MongoCollection schemaCollection;
+    private static ListDao listDao;
     private static String steamApiKey = Play.application().configuration().getString("apiKey");
-    private static String playerSummaryUrl = Play.application().configuration().getString("playerSummary");
     private static String domain = Play.application().configuration().getString("domain");
+    private static String playerSummaryUrl = Play.application().configuration().getString("playerSummary");
     private static String getPlayerItems = Play.application().configuration().getString("getPlayerItems");
 
-    static {
-        DB db;
-        try {
-            db = new MongoClient("127.0.0.1", 27017).getDB("list");
-            jongo = new Jongo(db);
-            userCollection = jongo.getCollection("items").withWriteConcern(WriteConcern.ACKNOWLEDGED);
-            schemaCollection = jongo.getCollection("schema").withWriteConcern(WriteConcern.ACKNOWLEDGED);
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
+    
     public static Result index() {
         return ok(index.render(""));
     }
@@ -97,58 +77,7 @@ public class Application extends Controller {
         return ok(index.render(""));
     }
 
-    public static Result logout() {
-        session().clear();
-        flash("success", "You have logged out");
-        return ok(index.render(""));
-    }
-
-    public static Result loginStatus() {
-        String steamId = session("steamId");
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        if (steamId != null) {
-            map.put("steamId", steamId);
-            map.put("loggedIn", true);
-            JsonNode result = Json.toJson(map);
-            return ok(result);
-        } else {
-            map.put("loggedIn", false);
-            JsonNode result = Json.toJson(map);
-            return ok(result);
-        }
-    }
-
-    public static Result openIDCallbackAPI() {
-        switch (session("success")) {
-        case "0": {
-            String url = "/id/" + session("steamId") + "/";
-            JsonNode result = Json.newObject().put("successUrl", url);
-            return ok(result);
-        }
-        case "1": {
-            String url = "/id/" + session("steamId") + "/";
-            JsonNode result = Json.newObject().put("successUrl", url);
-            return ok(result);
-        }
-        case "2": {
-            String url = "/id/" + session("steamId") + "/";
-            JsonNode result = Json.newObject().put("successUrl", url);
-            return ok(result);
-        }
-        case "-1": {
-            String url = "/loginFailed/";
-            JsonNode result = Json.newObject().put("successUrl", url);
-            return ok(result);
-        }
-        default: {
-            String url = "/iHaveNoIdea/";
-            JsonNode result = Json.newObject().put("successUrl", url);
-            return ok(result);
-        }
-        }
-
-    }
+    
 
     public static Result markImpossibleHistoric() throws FileNotFoundException {
 
@@ -170,112 +99,25 @@ public class Application extends Controller {
                     wantedItem.state = 0;
             }
         }
-        WriteResult u = userCollection.save(s);
-
+        WriteResult u = listDao.saveSteamUser(s);
+        
         ObjectNode result = Json.newObject();
         result.put("success", "Historic items marked");
         return ok(result);
     }
 
-    public static Promise<Result> openIDCallback() {
-        Promise<UserInfo> d = OpenID.verifiedId();
-
-        return d.map(new Function<UserInfo, Result>() {
-            public Result apply(UserInfo userInfo) throws MalformedURLException, IOException {
-                Long steamId = getSteamIdFromResponseUrl(userInfo.id);
-                if (steamId > 0) {
-                    // perform login tasks
-                    session("steamId", steamId.toString());
-                    // call newUserItemNothing function.
-                    int userStatus = getUserWelcomeStatus(steamId);
-                    switch (userStatus) {
-                    case 0:
-                        session("success", "0");
-                        return redirect("/id/" + steamId + "/");
-                    case 1:
-                        session("success", "1");
-                        return redirect("/id/" + steamId + "/");
-                    case 2:
-                        session("success", "2");
-                        return redirect("/id/" + steamId + "/");
-                    default:
-                        session("success", "-2");
-                        return redirect("/id/" + steamId + "/");
-                    }
-
-                } else {
-                    // something went wrong
-                    session("success", "-1");
-                    return ok(index.render(""));
-                }
-
-            }
-
-            /**
-             * Calls out to the database to obtain the UserWelcomeStatus:
-             *
-             * @param steamId
-             *
-             * @return 0 if the user is new
-             * @return 1 if the user is not new, but there are new items
-             * @return 2 if the user is not new and there are no new items
-             * @throws IOException
-             * @throws MalformedURLException
-             */
-            public int getUserWelcomeStatus(Long steamId) throws MalformedURLException, IOException {
-                // TODO Auto-generated method stub
-                Logger.info("Checking welcome status");
-                SteamUser user = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
-                if (user == null) {
-                    // TODO: create user
-                    createNewUser(steamId);
-                    return 0;
-                } else {
-                    Schema c = schemaCollection.findOne("").orderBy("{schemaVersion:-1}").as(Schema.class);
-                    if (c.getSchemaVersion() != user.schemaId) {
-                        // TODO: add new items
-                        return 1;
-                    } else {
-                        return 2;
-                    }
-                }
-            }
-
-            private void createNewUser(Long steamId) throws MalformedURLException, IOException {
-                // TODO Auto-generated method stub
-                Schema c = schemaCollection.findOne("").orderBy("{schemaVersion:-1}").as(Schema.class);
-                List<uk.co.solong.tf2.schema.Items> items = c.getResult().getItems();
-                SteamUser user = getNameFromSteam(steamId);
-                user.steamId = steamId;
-                user.item = new ArrayList<Item>();
-                user.schemaId = c.getSchemaVersion();
-
-                for (uk.co.solong.tf2.schema.Items item : items) {
-                    // item.
-                    Item wantedItem = new Item();
-                    wantedItem.itemId = item.getDefindex();
-                    wantedItem.state = 2;
-                    wantedItem.name = item.getItem_name();
-                    wantedItem.image = item.getImage_url();
-                    wantedItem.wantedId = UUID.randomUUID().toString();
-                    wantedItem.details = new ArrayList<Detail>();
-                    user.item.add(wantedItem);
-                }
-                userCollection.insert(user);
-            }
-
-            private Long getSteamIdFromResponseUrl(String responseUrl) {
-                String[] steamIdFragments = responseUrl.split("/");
-                try {
-                    return Long.parseLong(steamIdFragments[5]);
-                } catch (Throwable nfe) {
-                    return null;
-                }
-            }
-        });
-
-    }
-
+    
+/*
+ * Operation should run in 3 iterations.
+ * 1) for each item, add a detail if you have it.
+ *     - When adding a detail because you have it, if a superset of the detail exists, tick it off.
+ *     - When adding a detail because you have it, if a superset of the detail doesn't exist, just add the exact contents.
+ * 2) If a schema item is suppressable, and you don't have it, then suppress it.
+ * 3) if 'add missing qualities' is checked for each item, add a detail if you dont' have 1 detail in a possible quality, using the loosest sensible terms.
+ *    e.g. Any,Any,Any, Strange
+ *    - do not add any qualities which are in the "except" list (e.g. unusual)
+ *    - do not add this to any supressed items.
+ */
     public static Promise<Result> sync() {
 
         Long steamId = Long.parseLong(session("steamId"));
@@ -307,7 +149,7 @@ public class Application extends Controller {
 
                                 // Logger.info("Model generation complete {}",Json.toJson(s));
 
-                                WriteResult u = userCollection.save(s);
+                                WriteResult u = listDao.saveSteamUser(s);
                                 Logger.info("Write complete");
                                 ObjectNode result = Json.newObject();
                                 result.put("success", "Backpack synced");
@@ -519,7 +361,7 @@ public class Application extends Controller {
     }
 
     public static Result getName(Long steamId) {
-        SteamUser c = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
+        SteamUser c = listDao.findUser(steamId);
         if (c != null) {
             SteamUser user = new SteamUser();
             user.name = c.name;
@@ -531,56 +373,9 @@ public class Application extends Controller {
         }
     }
 
-    public static SteamUser getNameFromSteam(Long steamId) throws MalformedURLException, IOException {
-        // TODO: move this into a 1 time when user signs up, signs in, and
-        // refresh once per day efficiently
-        String url = String
-                .format("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=%s&steamIds=%s", new Object[] { steamApiKey, steamId });
-        Logger.info(url);
-        InputStream input = new URL(url).openStream();
-        Reader streamReader = new InputStreamReader(input, "UTF-8");
-        ObjectMapper m = new ObjectMapper();
-        ObjectReader reader = m.reader(PlayerSummaryResult.class);
-        PlayerSummaryResult s = reader.readValue(streamReader);
-        streamReader.close();
-        SteamUser user = new SteamUser();
-        user.name = s.getResponse().getPlayers().get(0).getPersonaname();
-        user.avatar = s.getResponse().getPlayers().get(0).getAvatarmedium();
-        return user;
-    }
+    
 
-    public static Result login() {
-
-        Logger.info("Logging in");
-        try {
-            OpenIdManager manager = new OpenIdManager();
-            manager.setReturnTo("http://" + domain + "/openIDCallback");
-            manager.setRealm("http://" + domain + "/");
-
-            Endpoint endpoint = manager.lookupEndpoint("http://steamcommunity.com/openid");
-            Association association = manager.lookupAssociation(endpoint);
-            String url = manager.getAuthenticationUrl(endpoint, association);
-            JsonNode result = Json.newObject().put("steamUrl", url);
-            return ok(result);
-
-        } catch (Exception e) {
-            JsonNode result = Json.newObject().put("steamDownUrl", "/steamDown");
-            return ok(result);
-        }
-
-        /*
-         * 
-         * Map<String, String> attributes = new HashMap<String, String>();
-         * attributes.put("email", "http://schema.openid.net/contact/email");
-         * Promise<String> p =
-         * OpenID.redirectURL("http://steamcommunity.com/openid",
-         * "http://localhost:8010/openIDCallback", null, null,
-         * "http://localhost:8010/");
-         * 
-         * return p.map(new Function<String, Result>() { public Result
-         * apply(String url) { return redirect(url); } });
-         */
-    }
+    
 
     public static Result getWantedList(Long steamId) {
         // call the dao to get the wanted list from the database
@@ -591,7 +386,7 @@ public class Application extends Controller {
     }
 
     private static SteamUser getPlayerItemDocumentFromMongo(Long steamId) {
-        SteamUser c = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
+        SteamUser c = listDao.findUser(steamId);
         return c;
     }
 
@@ -609,7 +404,7 @@ public class Application extends Controller {
         if (validDetail) {
             Logger.info("Valid input");
             long steamId = Long.parseLong(session("steamId"));
-            WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, item.wantedId).with("{$push:{item.$.details:#}}", item.details.get(0));
+            WriteResult u = listDao.saveDetail(steamId,item); 
             Logger.info("Add item");
 
             return ok(Json.toJson(item)); //
@@ -656,13 +451,13 @@ public class Application extends Controller {
 
         long steamId = Long.parseLong(session("steamId"));
 
-        SteamUser s = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
+        SteamUser s = listDao.findUser(steamId);
         for (Item item : s.item) {
             if (item.wantedId.equals(wantedId)) {
                 for (Detail detail : item.details) {
                     if (detail.detailId.equals(detailId)) {
                         item.details.remove(detail);
-                        WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.details:#}}", item.details);
+                        WriteResult u = listDao.deleteDetail(steamId,wantedId,item);
                         Logger.info("Results: {}", u.getN());
                         return ok(Json.newObject().put("rowCount", u.getN()));
                     }
@@ -687,14 +482,14 @@ public class Application extends Controller {
         } else {
 
             long steamId = Long.parseLong(session("steamId"));
-            SteamUser s = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
+            SteamUser s = listDao.findUser(steamId);
             for (Item item : s.item) {
                 if (item.wantedId.equals(wantedId)) {
                     for (Detail detail : item.details) {
                         if (detail.detailId.equals(detailId)) {
                             detail.priority = priority;
-                            WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, wantedId)
-                                    .with("{$set:{item.$.details:#}}", item.details);
+                            WriteResult u = listDao.setPriority(steamId,wantedId,item);
+                            
                             Logger.info("Results: {}", u.getN());
                             return ok(Json.newObject().put("rowCount", u.getN()));
                         }
@@ -738,13 +533,13 @@ public class Application extends Controller {
         // TODO extract the detailid, isObtained to true
 
         long steamId = Long.parseLong(session("steamId"));
-        SteamUser s = userCollection.findOne("{_id:#}", steamId).as(SteamUser.class);
+        SteamUser s = listDao.findUser(steamId);
         for (Item item : s.item) {
             if (item.wantedId.equals(wantedId)) {
                 for (Detail detail : item.details) {
                     if (detail.detailId.equals(detailId)) {
                         detail.isObtained = isObtained;
-                        WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.details:#}}", item.details);
+                        WriteResult u = listDao.setDetailObtained(steamId,wantedId,item);
                         Logger.info("Results: {}", u.getN());
                         return ok(Json.newObject().put("rowCount", u.getN()));
                     }
@@ -769,10 +564,18 @@ public class Application extends Controller {
 
     private static long setItemState(String wantedId, Long state) {
         long steamId = Long.parseLong(session("steamId"));
-        WriteResult u = userCollection.update("{_id:#, item.wantedId:#}", steamId, wantedId).with("{$set:{item.$.state:#}}", state);
+        WriteResult u = listDao.setItemState(steamId,wantedId,state);
         Logger.info("Executed");
         long rowCount = u.getN();
         return rowCount;
+    }
+
+    public ListDao getListDao() {
+        return listDao;
+    }
+
+    public void setListDao(ListDao listDao) {
+        Application.listDao = listDao;
     }
 
 }

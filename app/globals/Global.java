@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.joda.time.DateTime;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import play.Application;
 import play.GlobalSettings;
@@ -18,7 +19,6 @@ import play.Logger;
 import play.Play;
 import play.libs.Akka;
 import play.libs.F.Function;
-
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import scala.concurrent.duration.Duration;
@@ -59,9 +59,13 @@ public class Global extends GlobalSettings {
         language = Play.application().configuration().getString("language");
     }
 
-    // TODO: schedule http://backpack.tf/api/IGetPrices/v3/?format=json&key=?
+    
+    private AnnotationConfigApplicationContext context;
+ // TODO: schedule http://backpack.tf/api/IGetPrices/v3/?format=json&key=?
+
     @Override
     public void onStart(Application app) {
+        context = new AnnotationConfigApplicationContext();
         Logger.info("Scheduling schema watcher");
         Akka.system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS), Duration.create(1, TimeUnit.HOURS),
 
@@ -73,7 +77,6 @@ public class Global extends GlobalSettings {
                     public Result apply(WSResponse response) {
                         try {
                             Logger.info("Fetching schema data");
-                            Logger.debug(response.getBody());
                             InputStream input = response.getBodyAsStream();
                             Reader streamReader = new InputStreamReader(input, "UTF-8");
                             ObjectMapper m = new ObjectMapper();
@@ -126,5 +129,10 @@ public class Global extends GlobalSettings {
 
         );
 
+    }
+    
+    @Override
+    public <A> A getControllerInstance(Class<A> type) throws Exception {
+          return context.getBean(type);
     }
 }
