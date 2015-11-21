@@ -1,0 +1,19 @@
+require './puppet_deps'
+Vagrant.configure(2) do |config|
+    config.vm.box = "ubuntu/trusty64"
+    config.vm.provision :shell, :inline => install_dep('puppetlabs-stdlib')
+    config.vm.provision :shell, :inline => install_dep('tylerwalts-jdk_oracle')
+    config.vm.provision :shell, :inline => install_dep('puppetlabs-mongodb')
+    config.vm.provision :shell, :inline => install_dep('attachmentgenie-ufw')
+    config.vm.provision :shell, :inline => install_dep('netmanagers-fail2ban')
+    config.vm.provision :shell, :inline => install_dep('example42-timezone')
+    config.vm.provision :shell, :inline => install_dep('domcleal/augeasproviders')
+    config.vm.provision :shell, :inline => install_dep('puppetlabs-rabbitmq')
+    config.vm.provision :shell, :inline => install_dep('maestrodev-wget')    
+    config.vm.provision :shell, :inline => install_dep('puppetlabs-apt')    
+    config.vm.provision "puppet"
+    config.vm.network "forwarded_port", guest: 5672, host: 5672
+    config.vm.network "forwarded_port", guest: 15672, host: 15672
+    config.vm.network "forwarded_port", guest: 27017, host: 27017
+    
+end
