@@ -1,0 +1,27 @@
+
+<div class="well well-sm">
+
+	<div class="row">
+		<div class="col-xs-4">
+			<button type="button" class="btn btn-default"
+				ng-class="{ disabled : pagination.current == 1 }"
+				ng-click="setCurrent(pagination.current - 1)">Previous</button>
+		</div>
+		<div class="col-xs-4">
+			<p class="text-center">{{ range.lower }} - {{
+				range.upper }} of {{ range.total }}</p>
+		</div>
+		<div class="col-xs-4">
+			<button type="button" class="btn btn-default pull-right"
+				ng-class="{ disabled : pagination.current == pagination.last }"
+				ng-click="setCurrent(pagination.current + 1)">Next</button>
+		</div>
+	</div>
+
+
+
+
+
+
+
+</div>

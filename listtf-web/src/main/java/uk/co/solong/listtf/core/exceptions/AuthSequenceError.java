@@ -1,4 +1,4 @@
-package uk.co.solong.listtf.web.controllers;
+package uk.co.solong.listtf.core.exceptions;
 
 public class AuthSequenceError extends RuntimeException {
 
