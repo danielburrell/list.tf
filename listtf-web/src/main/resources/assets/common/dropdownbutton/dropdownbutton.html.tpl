@@ -6,7 +6,7 @@
 			Quality <span class="caret"></span>
 		</button>
 		<ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-			<li><a href="#">Unique</a></li>
+			<li><a href="#" ng-click="">Unique</a></li>
 			<li><a href="#">Genuine</a></li>
 			<li><a href="#">Any</a></li>
 		</ul>
